@@ -57,6 +57,7 @@ export async function action({ request, params }) {
     return redirect("/app");
   }
 
+  /** @type {any} */
   const data = {
     ...Object.fromEntries(await request.formData()),
     shop,
@@ -95,13 +96,13 @@ export default function QRCodeForm() {
 
   // [START select-product]
   async function selectProduct() {
-    const product = await window.shopify.resourcePicker({
+    const products = await window.shopify.resourcePicker({
       type: "product",
-      action: "Select", // customized action verb, either 'Select' or 'Add',
+      action: "select", // customized action verb, either 'select' or 'add',
     });
 
-    if (product) {
-      const { images, id, variants, title, handle } = product.selection[0];
+    if (products) {
+      const { images, id, variants, title, handle } = products[0];
 
       setFormState({
         ...formState,
@@ -110,7 +111,7 @@ export default function QRCodeForm() {
         productTitle: title,
         productHandle: handle,
         productAlt: images[0]?.altText,
-        productImage: images[0]?.imageSrc || images[0]?.originalSrc,
+        productImage: images[0]?.originalSrc,
       });
     }
   }
