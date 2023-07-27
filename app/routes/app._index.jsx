@@ -127,9 +127,9 @@ export default function Index() {
   return (
     <Page>
       <ui-title-bar title="QR codes">
-        <Link variant="primary" to="/app/qrcodes/new">
+        <button variant="primary" onClick={() => navigate("/app/qrcodes/new")}>
           Create QR code
-        </Link>
+        </button>
       </ui-title-bar>
       <Layout>
         <Layout.Section>
