@@ -33,6 +33,7 @@ export default function Index() {
   const navigate = useNavigate();
 
   function truncate(str) {
+    if (!str) return;
     const n = 25;
     return str.length > n ? str.substr(0, n - 1) + "…" : str;
   }
