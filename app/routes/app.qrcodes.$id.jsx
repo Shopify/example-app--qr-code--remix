@@ -122,9 +122,9 @@ export default function QRCodeForm() {
   function handleSave() {
     const data = {
       title: formState.title,
-      productId: formState.productId,
-      productVariantId: formState.productVariantId,
-      productHandle: formState.productHandle,
+      productId: formState.productId || "",
+      productVariantId: formState.productVariantId || "",
+      productHandle: formState.productHandle || "",
       destination: formState.destination,
     };
 
