@@ -82,10 +82,10 @@ async function supplementQRCode(QRCode, graphql) {
 
   return {
     ...QRCode,
-    productDeleted: !product.title,
-    productTitle: product.title,
-    productImage: product.images?.nodes[0]?.url,
-    productAlt: product.images?.nodes[0]?.altText,
+    productDeleted: !product?.title,
+    productTitle: product?.title,
+    productImage: product?.images?.nodes[0]?.url,
+    productAlt: product?.images?.nodes[0]?.altText,
     destinationUrl: getDestinationUrl(QRCode),
     image: await getQRCodeImage(QRCode.id),
   };

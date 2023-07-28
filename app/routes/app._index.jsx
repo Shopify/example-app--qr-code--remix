@@ -33,6 +33,7 @@ export default function Index() {
   const navigate = useNavigate();
 
   function truncate(str) {
+    if (!str) return;
     const n = 25;
     return str.length > n ? str.substr(0, n - 1) + "…" : str;
   }
@@ -97,13 +98,11 @@ export default function Index() {
                 {/* [START deleted] */}
                 {productDeleted ? (
                   <HorizontalStack align="start" gap={"2"}>
-                    <Tooltip content="product has been deleted">
-                      <span style={{ width: "20px" }}>
-                        <Icon source={DiamondAlertMajor} color="critical" />
-                      </span>
-                    </Tooltip>
-                    <Text color={productDeleted && "critical"} as="span">
-                      {truncate(productTitle)}
+                    <span style={{ width: "20px" }}>
+                      <Icon source={DiamondAlertMajor} color="critical" />
+                    </span>
+                    <Text color={"critical"} as="span">
+                      product has been deleted
                     </Text>
                   </HorizontalStack>
                 ) : (
