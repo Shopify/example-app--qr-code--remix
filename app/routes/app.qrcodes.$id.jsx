@@ -69,12 +69,12 @@ export async function action({ request, params }) {
     return json({ errors }, { status: 422 });
   }
 
-  const QRCode =
+  const qrCode =
     params.id === "new"
       ? await db.qRCode.create({ data })
       : await db.qRCode.update({ where: { id: Number(params.id) }, data });
 
-  return redirect(`/app/qrcodes/${QRCode.id}`);
+  return redirect(`/app/qrcodes/${qrCode.id}`);
 }
 // [END action]
 
@@ -82,9 +82,9 @@ export async function action({ request, params }) {
 export default function QRCodeForm() {
   const errors = useActionData()?.errors || {};
 
-  const QRCode = useLoaderData();
-  const [formState, setFormState] = useState(QRCode);
-  const [cleanFormState, setCleanFormState] = useState(QRCode);
+  const qrCode = useLoaderData();
+  const [formState, setFormState] = useState(qrCode);
+  const [cleanFormState, setCleanFormState] = useState(qrCode);
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
 
   const nav = useNavigation();
@@ -137,7 +137,7 @@ export default function QRCodeForm() {
   return (
     <Page>
       {/* [START breadcrumbs] */}
-      <ui-title-bar title={QRCode.id ? "Edit QR code" : "Create new QR code"}>
+      <ui-title-bar title={qrCode.id ? "Edit QR code" : "Create new QR code"}>
         <button variant="breadcrumb" onClick={() => navigate("/app")}>
           QR codes
         </button>
@@ -231,8 +231,8 @@ export default function QRCodeForm() {
                     }
                     error={errors.destination}
                   />
-                  {QRCode.destinationUrl ? (
-                    <Button plain url={QRCode.destinationUrl} external>
+                  {qrCode.destinationUrl ? (
+                    <Button plain url={qrCode.destinationUrl} external>
                       Go to destination URL
                     </Button>
                   ) : null}
@@ -248,8 +248,8 @@ export default function QRCodeForm() {
             <Text as={"h2"} variant="headingLg">
               QR code
             </Text>
-            {QRCode ? (
-              <EmptyState image={QRCode.image} imageContained={true} />
+            {qrCode ? (
+              <EmptyState image={qrCode.image} imageContained={true} />
             ) : (
               <EmptyState image="">
                 Your QR code will appear here after you save
@@ -257,16 +257,16 @@ export default function QRCodeForm() {
             )}
             <VerticalStack gap="3">
               <Button
-                disabled={!QRCode?.image}
-                url={QRCode?.image}
+                disabled={!qrCode?.image}
+                url={qrCode?.image}
                 download
                 primary
               >
                 Download
               </Button>
               <Button
-                disabled={!QRCode.id}
-                url={`/qrcodes/${QRCode.id}`}
+                disabled={!qrCode.id}
+                url={`/qrcodes/${qrCode.id}`}
                 external
               >
                 Go to public URL
@@ -282,7 +282,7 @@ export default function QRCodeForm() {
               {
                 content: "Delete",
                 loading: isDeleting,
-                disabled: !QRCode.id || !QRCode || isSaving || isDeleting,
+                disabled: !qrCode.id || !qrCode || isSaving || isDeleting,
                 destructive: true,
                 outline: true,
                 onAction: () => submit({}, { method: "delete" }),

@@ -3,27 +3,27 @@ import db from "../db.server";
 
 // [START get-qrcode]
 export async function getQRCode(id, graphql) {
-  const QRCode = await db.qRCode.findFirst({ where: { id } });
+  const qrCode = await db.qRCode.findFirst({ where: { id } });
 
-  if (!QRCode) {
+  if (!qrCode) {
     return null;
   }
 
-  return supplementQRCode(QRCode, graphql);
+  return supplementQRCode(qrCode, graphql);
 }
 
 export async function getQRCodes(shop, graphql) {
-  const QRCodes = await db.qRCode.findMany({
+  const qrCodes = await db.qRCode.findMany({
     where: { shop },
     orderBy: { id: "desc" },
   });
 
-  if (!QRCodes.length) {
-    return QRCodes;
+  if (!qrCodes.length) {
+    return qrCodes;
   }
 
   return Promise.all(
-    QRCodes.map(async (QRCode) => supplementQRCode(QRCode, graphql))
+    qrCodes.map(async (qrCode) => supplementQRCode(qrCode, graphql))
   );
 }
 // [END get-qrcode]
@@ -38,22 +38,22 @@ export async function getQRCodeImage(id) {
 // [END get-qrcode-image]
 
 // [START get-destination]
-export function getDestinationUrl(QRCode) {
-  if (QRCode.destination === "product") {
-    return `https://${QRCode.shop}/products/${QRCode.productHandle}`;
+export function getDestinationUrl(qrCode) {
+  if (qrCode.destination === "product") {
+    return `https://${qrCode.shop}/products/${qrCode.productHandle}`;
   }
 
-  const id = QRCode.productVariantId.replace(
+  const id = qrCode.productVariantId.replace(
     /gid:\/\/shopify\/ProductVariant\/([0-9]+)/,
     "$1"
   );
 
-  return `https://${QRCode.shop}/cart/${id}:1`;
+  return `https://${qrCode.shop}/cart/${id}:1`;
 }
 // [END get-destination]
 
 // [START hydrate-qrcode]
-async function supplementQRCode(QRCode, graphql) {
+async function supplementQRCode(qrCode, graphql) {
   const response = await graphql(
     `
       query supplementQRCode($id: ID!) {
@@ -70,7 +70,7 @@ async function supplementQRCode(QRCode, graphql) {
     `,
     {
       variables: {
-        id: QRCode.productId,
+        id: qrCode.productId,
       },
     }
   );
@@ -80,13 +80,13 @@ async function supplementQRCode(QRCode, graphql) {
   } = await response.json();
 
   return {
-    ...QRCode,
+    ...qrCode,
     productDeleted: !product?.title,
     productTitle: product?.title,
     productImage: product?.images?.nodes[0]?.url,
     productAlt: product?.images?.nodes[0]?.altText,
-    destinationUrl: getDestinationUrl(QRCode),
-    image: await getQRCodeImage(QRCode.id),
+    destinationUrl: getDestinationUrl(qrCode),
+    image: await getQRCodeImage(qrCode.id),
   };
 }
 // [END hydrate-qrcode]
