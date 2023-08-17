@@ -19,7 +19,7 @@ export async function getQRCodes(shop, graphql) {
   });
 
   return Promise.all(
-    qrCodes.map(async (qrCode) => supplementQRCode(qrCode, graphql))
+    qrCodes.map((qrCode) => supplementQRCode(qrCode, graphql))
   );
 }
 // [END get-qrcode]
