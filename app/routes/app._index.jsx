@@ -11,7 +11,6 @@ import {
   Text,
   Icon,
   HorizontalStack,
-  Tooltip,
 } from "@shopify/polaris";
 
 import { getQRCodes } from "../models/QRCode.server";
