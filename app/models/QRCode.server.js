@@ -51,6 +51,8 @@ export function getDestinationUrl(qrCode) {
 
 // [START hydrate-qrcode]
 async function supplementQRCode(qrCode, graphql) {
+  const qrCodeImagePromise = getQRCodeImage(qrCode.id);
+
   const response = await graphql(
     `
       query supplementQRCode($id: ID!) {
@@ -83,7 +85,7 @@ async function supplementQRCode(qrCode, graphql) {
     productImage: product?.images?.nodes[0]?.url,
     productAlt: product?.images?.nodes[0]?.altText,
     destinationUrl: getDestinationUrl(qrCode),
-    image: await getQRCodeImage(qrCode.id),
+    image: await qrCodeImagePromise,
   };
 }
 // [END hydrate-qrcode]
