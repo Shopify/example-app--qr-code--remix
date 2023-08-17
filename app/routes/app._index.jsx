@@ -19,16 +19,16 @@ import { DiamondAlertMajor, ImageMajor } from "@shopify/polaris-icons";
 // [START loader]
 export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
-  const QRCodes = await getQRCodes(session.shop, admin.graphql);
+  const qrCodes = await getQRCodes(session.shop, admin.graphql);
 
   return json({
-    QRCodes,
+    qrCodes,
   });
 }
 // [END loader]
 
 export default function Index() {
-  const { QRCodes } = useLoaderData();
+  const { qrCodes } = useLoaderData();
   const navigate = useNavigate();
 
   function truncate(str) {
@@ -38,7 +38,7 @@ export default function Index() {
   }
 
   // [START empty]
-  const emptyMarkup = QRCodes.length ? null : (
+  const emptyMarkup = qrCodes.length ? null : (
     <EmptyState
       heading="Create unique QR codes for your product"
       action={{
@@ -53,13 +53,13 @@ export default function Index() {
   // [END empty]
 
   // [START table]
-  const qrCodesMarkup = QRCodes.length ? (
+  const qrCodesMarkup = qrCodes.length ? (
     <IndexTable
       resourceName={{
         singular: "QR code",
         plural: "QR codes",
       }}
-      itemCount={QRCodes.length}
+      itemCount={qrCodes.length}
       headings={[
         { title: "Thumbnail", hidden: true },
         { title: "Title" },
@@ -70,7 +70,7 @@ export default function Index() {
       selectable={false}
     >
       {/* [END table] */}
-      {QRCodes.map(
+      {qrCodes.map(
         ({
           id,
           title,
