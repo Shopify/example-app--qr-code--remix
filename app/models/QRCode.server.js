@@ -18,10 +18,6 @@ export async function getQRCodes(shop, graphql) {
     orderBy: { id: "desc" },
   });
 
-  if (!qrCodes.length) {
-    return qrCodes;
-  }
-
   return Promise.all(
     qrCodes.map(async (qrCode) => supplementQRCode(qrCode, graphql))
   );
