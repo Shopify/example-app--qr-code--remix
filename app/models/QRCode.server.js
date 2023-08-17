@@ -39,12 +39,13 @@ export function getDestinationUrl(qrCode) {
     return `https://${qrCode.shop}/products/${qrCode.productHandle}`;
   }
 
-  const id = qrCode.productVariantId.replace(
-    /gid:\/\/shopify\/ProductVariant\/([0-9]+)/,
-    "$1"
-  );
+  const match = /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
 
-  return `https://${qrCode.shop}/cart/${id}:1`;
+  if (!match) {
+    throw Error("Unrecognized product variant ID");
+  }
+
+  return `https://${qrCode.shop}/cart/${match[1]}:1`;
 }
 // [END get-destination]
 
