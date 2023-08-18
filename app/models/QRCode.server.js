@@ -1,5 +1,6 @@
 import qrcode from "qrcode";
 import db from "../db.server";
+import invariant from "tiny-invariant";
 
 // [START get-qrcode]
 export async function getQRCode(id, graphql) {
@@ -38,10 +39,7 @@ export function getDestinationUrl(qrCode) {
   }
 
   const match = /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
-
-  if (!match) {
-    throw Error("Unrecognized product variant ID");
-  }
+  invariant(match, "Unrecognized product variant ID");
 
   return `https://${qrCode.shop}/cart/${match[1]}:1`;
 }
