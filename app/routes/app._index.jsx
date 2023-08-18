@@ -27,100 +27,91 @@ export async function loader({ request }) {
 }
 // [END loader]
 
+// [START empty]
+const EmptyQRCodeState = ({ onAction }) => (
+  <EmptyState
+    heading="Create unique QR codes for your product"
+    action={{
+      content: "Create QR code",
+      onAction,
+    }}
+    image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+  >
+    <p>Allow customers to scan codes and buy products using their phones.</p>
+  </EmptyState>
+);
+// [END empty]
+
+function truncate(str, { length = 25 } = {}) {
+  str = str || "";
+  if (str.length <= length) return str;
+  return str.slice(0, length) + "…";
+}
+
+// [START table]
+const QRTable = ({ qrCodes }) => (
+  <IndexTable
+    resourceName={{
+      singular: "QR code",
+      plural: "QR codes",
+    }}
+    itemCount={qrCodes.length}
+    headings={[
+      { title: "Thumbnail", hidden: true },
+      { title: "Title" },
+      { title: "Product" },
+      { title: "Date created" },
+      { title: "Scans" },
+    ]}
+    selectable={false}
+  >
+    {qrCodes.map((qrCode, i) => (
+      <QRTableRow key={i} qrCode={qrCode} />
+    ))}
+  </IndexTable>
+);
+// [END table]
+
+// [START row]
+const QRTableRow = ({ qrCode }) => (
+  <IndexTable.Row id={qrCode.id} position={qrCode.id}>
+    <IndexTable.Cell>
+      <Thumbnail
+        source={qrCode.productImage || ImageMajor}
+        alt={qrCode.productTitle}
+        size="small"
+      />
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      <Link to={`qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      {/* [START deleted] */}
+      {qrCode.productDeleted ? (
+        <HorizontalStack align="start" gap="2">
+          <span style={{ width: "20px" }}>
+            <Icon source={DiamondAlertMajor} color="critical" />
+          </span>
+          <Text color="critical" as="span">
+            product has been deleted
+          </Text>
+        </HorizontalStack>
+      ) : (
+        truncate(qrCode.productTitle)
+      )}
+      {/* [END deleted] */}
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      {new Date(qrCode.createdAt).toDateString()}
+    </IndexTable.Cell>
+    <IndexTable.Cell>{qrCode.scans}</IndexTable.Cell>
+  </IndexTable.Row>
+);
+// [END row]
+
 export default function Index() {
   const { qrCodes } = useLoaderData();
   const navigate = useNavigate();
-
-  function truncate(str) {
-    if (!str) return;
-    const n = 25;
-    return str.length > n ? str.substr(0, n - 1) + "…" : str;
-  }
-
-  // [START empty]
-  // TODO: split these out into components to make the logic in the return simpler
-  const emptyMarkup = qrCodes.length ? null : (
-    <EmptyState
-      heading="Create unique QR codes for your product"
-      action={{
-        content: "Create QR code",
-        onAction: () => navigate("qrcodes/new"),
-      }}
-      image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-    >
-      <p>Allow customers to scan codes and buy products using their phones.</p>
-    </EmptyState>
-  );
-  // [END empty]
-
-  // [START table]
-  const qrCodesMarkup = qrCodes.length ? (
-    <IndexTable
-      resourceName={{
-        singular: "QR code",
-        plural: "QR codes",
-      }}
-      itemCount={qrCodes.length}
-      headings={[
-        { title: "Thumbnail", hidden: true },
-        { title: "Title" },
-        { title: "Product" },
-        { title: "Date created" },
-        { title: "Scans" },
-      ]}
-      selectable={false}
-    >
-      {/* [END table] */}
-      {qrCodes.map(
-        ({
-          id,
-          title,
-          productImage,
-          productTitle,
-          productDeleted,
-          createdAt,
-          scans,
-        }) => {
-          // [START row]
-          return (
-            <IndexTable.Row id={id} key={id} position={id}>
-              <IndexTable.Cell>
-                <Thumbnail
-                  source={productImage || ImageMajor}
-                  alt={"product image or placeholder"}
-                  size="small"
-                />
-              </IndexTable.Cell>
-              <IndexTable.Cell>
-                <Link to={`qrcodes/${id}`}>{truncate(title)}</Link>
-              </IndexTable.Cell>
-              <IndexTable.Cell>
-                {/* [START deleted] */}
-                {productDeleted ? (
-                  <HorizontalStack align="start" gap={"2"}>
-                    <span style={{ width: "20px" }}>
-                      <Icon source={DiamondAlertMajor} color="critical" />
-                    </span>
-                    <Text color={"critical"} as="span">
-                      product has been deleted
-                    </Text>
-                  </HorizontalStack>
-                ) : (
-                  truncate(productTitle)
-                )}
-                {/* [END deleted] */}
-              </IndexTable.Cell>
-              <IndexTable.Cell>
-                {new Date(createdAt).toDateString()}
-              </IndexTable.Cell>
-              <IndexTable.Cell>{scans}</IndexTable.Cell>
-            </IndexTable.Row>
-          );
-          // [END row]
-        }
-      )}
-    </IndexTable>
-  ) : null;
 
   // [START page]
   return (
@@ -132,9 +123,12 @@ export default function Index() {
       </ui-title-bar>
       <Layout>
         <Layout.Section>
-          <Card padding={"0"}>
-            {emptyMarkup}
-            {qrCodesMarkup}
+          <Card padding="0">
+            {qrCodes.length === 0 ? (
+              <EmptyQRCodeState onAction={() => navigate("qrcodes/new")} />
+            ) : (
+              <QRTable qrCodes={qrCodes} />
+            )}
           </Card>
         </Layout.Section>
       </Layout>
