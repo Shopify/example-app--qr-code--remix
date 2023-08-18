@@ -38,6 +38,7 @@ export default function Index() {
   }
 
   // [START empty]
+  // TODO: split these out into components to make the logic in the return simpler
   const emptyMarkup = qrCodes.length ? null : (
     <EmptyState
       heading="Create unique QR codes for your product"

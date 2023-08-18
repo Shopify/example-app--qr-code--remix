@@ -89,6 +89,7 @@ export default function QRCodeForm() {
 
   const nav = useNavigation();
   const isSaving = nav.state === "submitting" && nav.formMethod === "POST";
+  // TODO: stop using delete?
   const isDeleting = nav.state === "submitting" && nav.formMethod === "DELETE";
   // [END state]
 
