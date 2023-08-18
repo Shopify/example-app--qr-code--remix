@@ -27,9 +27,7 @@ export async function getQRCodes(shop, graphql) {
 // [START get-qrcode-image]
 export async function getQRCodeImage(id) {
   const url = new URL(`/qrcodes/${id}/scan`, process.env.SHOPIFY_APP_URL);
-  const image = await qrcode.toBuffer(url.href);
-
-  return `data:image/jpeg;base64, ${image.toString("base64")}`;
+  return qrcode.toDataURL(url.href);
 }
 // [END get-qrcode-image]
 
