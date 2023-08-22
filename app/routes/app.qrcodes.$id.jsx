@@ -52,16 +52,16 @@ export async function action({ request, params }) {
   const { session } = await authenticate.admin(request);
   const { shop } = session;
 
-  if (request.method === "DELETE") {
-    await db.qRCode.delete({ where: { id: Number(params.id) } });
-    return redirect("/app");
-  }
-
   /** @type {any} */
   const data = {
     ...Object.fromEntries(await request.formData()),
     shop,
   };
+
+  if (data.action === "delete") {
+    await db.qRCode.delete({ where: { id: Number(params.id) } });
+    return redirect("/app");
+  }
 
   const errors = validateQRCode(data);
 
@@ -88,8 +88,10 @@ export default function QRCodeForm() {
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
 
   const nav = useNavigation();
-  const isSaving = nav.state === "submitting" && nav.formMethod === "POST";
-  const isDeleting = nav.state === "submitting" && nav.formMethod === "DELETE";
+  const isSaving =
+    nav.state === "submitting" && nav.formData?.get("action") !== "delete";
+  const isDeleting =
+    nav.state === "submitting" && nav.formData?.get("action") === "delete";
   // [END state]
 
   const navigate = useNavigate();
@@ -159,9 +161,7 @@ export default function QRCodeForm() {
                   labelHidden
                   autoComplete="off"
                   value={formState.title}
-                  onChange={(title) =>
-                    setFormState({ ...formState, title: title })
-                  }
+                  onChange={(title) => setFormState({ ...formState, title })}
                   error={errors.title}
                 />
               </VerticalStack>
@@ -285,7 +285,8 @@ export default function QRCodeForm() {
                 disabled: !qrCode.id || !qrCode || isSaving || isDeleting,
                 destructive: true,
                 outline: true,
-                onAction: () => submit({}, { method: "delete" }),
+                onAction: () =>
+                  submit({ action: "delete" }, { method: "post" }),
               },
             ]}
             primaryAction={{

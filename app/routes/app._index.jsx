@@ -11,7 +11,6 @@ import {
   Text,
   Icon,
   HorizontalStack,
-  Tooltip,
 } from "@shopify/polaris";
 
 import { getQRCodes } from "../models/QRCode.server";
@@ -20,107 +19,99 @@ import { DiamondAlertMajor, ImageMajor } from "@shopify/polaris-icons";
 // [START loader]
 export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
-  const QRCodes = await getQRCodes(session.shop, admin.graphql);
+  const qrCodes = await getQRCodes(session.shop, admin.graphql);
 
   return json({
-    QRCodes,
+    qrCodes,
   });
 }
 // [END loader]
 
-export default function Index() {
-  const { QRCodes } = useLoaderData();
-  const navigate = useNavigate();
+// [START empty]
+const EmptyQRCodeState = ({ onAction }) => (
+  <EmptyState
+    heading="Create unique QR codes for your product"
+    action={{
+      content: "Create QR code",
+      onAction,
+    }}
+    image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+  >
+    <p>Allow customers to scan codes and buy products using their phones.</p>
+  </EmptyState>
+);
+// [END empty]
 
-  function truncate(str) {
-    if (!str) return;
-    const n = 25;
-    return str.length > n ? str.substr(0, n - 1) + "…" : str;
-  }
+function truncate(str, { length = 25 } = {}) {
+  if (!str) return "";
+  if (str.length <= length) return str;
+  return str.slice(0, length) + "…";
+}
 
-  // [START empty]
-  const emptyMarkup = QRCodes.length ? null : (
-    <EmptyState
-      heading="Create unique QR codes for your product"
-      action={{
-        content: "Create QR code",
-        onAction: () => navigate("qrcodes/new"),
-      }}
-      image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-    >
-      <p>Allow customers to scan codes and buy products using their phones.</p>
-    </EmptyState>
-  );
-  // [END empty]
+// [START table]
+const QRTable = ({ qrCodes }) => (
+  <IndexTable
+    resourceName={{
+      singular: "QR code",
+      plural: "QR codes",
+    }}
+    itemCount={qrCodes.length}
+    headings={[
+      { title: "Thumbnail", hidden: true },
+      { title: "Title" },
+      { title: "Product" },
+      { title: "Date created" },
+      { title: "Scans" },
+    ]}
+    selectable={false}
+  >
+    {qrCodes.map((qrCode) => (
+      <QRTableRow key={qrCode.id} qrCode={qrCode} />
+    ))}
+  </IndexTable>
+);
+// [END table]
 
-  // [START table]
-  const qrCodesMarkup = QRCodes.length ? (
-    <IndexTable
-      resourceName={{
-        singular: "QR code",
-        plural: "QR codes",
-      }}
-      itemCount={QRCodes.length}
-      headings={[
-        { title: "Thumbnail", hidden: true },
-        { title: "Title" },
-        { title: "Product" },
-        { title: "Date created" },
-        { title: "Scans" },
-      ]}
-      selectable={false}
-    >
-      {/* [END table] */}
-      {QRCodes.map(
-        ({
-          id,
-          title,
-          productImage,
-          productTitle,
-          productDeleted,
-          createdAt,
-          scans,
-        }) => {
-          // [START row]
-          return (
-            <IndexTable.Row id={id} key={id} position={id}>
-              <IndexTable.Cell>
-                <Thumbnail
-                  source={productImage || ImageMajor}
-                  alt={"product image or placeholder"}
-                  size="small"
-                />
-              </IndexTable.Cell>
-              <IndexTable.Cell>
-                <Link to={`qrcodes/${id}`}>{truncate(title)}</Link>
-              </IndexTable.Cell>
-              <IndexTable.Cell>
-                {/* [START deleted] */}
-                {productDeleted ? (
-                  <HorizontalStack align="start" gap={"2"}>
-                    <span style={{ width: "20px" }}>
-                      <Icon source={DiamondAlertMajor} color="critical" />
-                    </span>
-                    <Text color={"critical"} as="span">
-                      product has been deleted
-                    </Text>
-                  </HorizontalStack>
-                ) : (
-                  truncate(productTitle)
-                )}
-                {/* [END deleted] */}
-              </IndexTable.Cell>
-              <IndexTable.Cell>
-                {new Date(createdAt).toDateString()}
-              </IndexTable.Cell>
-              <IndexTable.Cell>{scans}</IndexTable.Cell>
-            </IndexTable.Row>
-          );
-          // [END row]
-        }
+// [START row]
+const QRTableRow = ({ qrCode }) => (
+  <IndexTable.Row id={qrCode.id} position={qrCode.id}>
+    <IndexTable.Cell>
+      <Thumbnail
+        source={qrCode.productImage || ImageMajor}
+        alt={qrCode.productTitle}
+        size="small"
+      />
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      <Link to={`qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      {/* [START deleted] */}
+      {qrCode.productDeleted ? (
+        <HorizontalStack align="start" gap="2">
+          <span style={{ width: "20px" }}>
+            <Icon source={DiamondAlertMajor} color="critical" />
+          </span>
+          <Text color="critical" as="span">
+            product has been deleted
+          </Text>
+        </HorizontalStack>
+      ) : (
+        truncate(qrCode.productTitle)
       )}
-    </IndexTable>
-  ) : null;
+      {/* [END deleted] */}
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      {new Date(qrCode.createdAt).toDateString()}
+    </IndexTable.Cell>
+    <IndexTable.Cell>{qrCode.scans}</IndexTable.Cell>
+  </IndexTable.Row>
+);
+// [END row]
+
+export default function Index() {
+  const { qrCodes } = useLoaderData();
+  const navigate = useNavigate();
 
   // [START page]
   return (
@@ -132,9 +123,12 @@ export default function Index() {
       </ui-title-bar>
       <Layout>
         <Layout.Section>
-          <Card padding={"0"}>
-            {emptyMarkup}
-            {qrCodesMarkup}
+          <Card padding="0">
+            {qrCodes.length === 0 ? (
+              <EmptyQRCodeState onAction={() => navigate("qrcodes/new")} />
+            ) : (
+              <QRTable qrCodes={qrCodes} />
+            )}
           </Card>
         </Layout.Section>
       </Layout>

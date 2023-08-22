@@ -1,4 +1,5 @@
 import qrcode from "qrcode";
+import invariant from "tiny-invariant";
 import db from "../db.server";
 
 // [START get-qrcode]
@@ -18,22 +19,18 @@ export async function getQRCodes(shop, graphql) {
     orderBy: { id: "desc" },
   });
 
-  if (!qrCodes.length) {
-    return qrCodes;
-  }
+  if (qrCodes.length === 0) return [];
 
   return Promise.all(
-    qrCodes.map(async (qrCode) => supplementQRCode(qrCode, graphql))
+    qrCodes.map((qrCode) => supplementQRCode(qrCode, graphql))
   );
 }
 // [END get-qrcode]
 
 // [START get-qrcode-image]
-export async function getQRCodeImage(id) {
+export function getQRCodeImage(id) {
   const url = new URL(`/qrcodes/${id}/scan`, process.env.SHOPIFY_APP_URL);
-  const image = await qrcode.toBuffer(url.href);
-
-  return `data:image/jpeg;base64, ${image.toString("base64")}`;
+  return qrcode.toDataURL(url.href);
 }
 // [END get-qrcode-image]
 
@@ -43,17 +40,17 @@ export function getDestinationUrl(qrCode) {
     return `https://${qrCode.shop}/products/${qrCode.productHandle}`;
   }
 
-  const id = qrCode.productVariantId.replace(
-    /gid:\/\/shopify\/ProductVariant\/([0-9]+)/,
-    "$1"
-  );
+  const match = /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
+  invariant(match, "Unrecognized product variant ID");
 
-  return `https://${qrCode.shop}/cart/${id}:1`;
+  return `https://${qrCode.shop}/cart/${match[1]}:1`;
 }
 // [END get-destination]
 
 // [START hydrate-qrcode]
 async function supplementQRCode(qrCode, graphql) {
+  const qrCodeImagePromise = getQRCodeImage(qrCode.id);
+
   const response = await graphql(
     `
       query supplementQRCode($id: ID!) {
@@ -86,7 +83,7 @@ async function supplementQRCode(qrCode, graphql) {
     productImage: product?.images?.nodes[0]?.url,
     productAlt: product?.images?.nodes[0]?.altText,
     destinationUrl: getDestinationUrl(qrCode),
-    image: await getQRCodeImage(qrCode.id),
+    image: await qrCodeImagePromise,
   };
 }
 // [END hydrate-qrcode]
