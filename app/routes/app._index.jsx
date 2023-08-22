@@ -43,7 +43,7 @@ const EmptyQRCodeState = ({ onAction }) => (
 // [END empty]
 
 function truncate(str, { length = 25 } = {}) {
-  str = str || "";
+  if (!str) return "";
   if (str.length <= length) return str;
   return str.slice(0, length) + "…";
 }
