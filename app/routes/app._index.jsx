@@ -65,8 +65,8 @@ const QRTable = ({ qrCodes }) => (
     ]}
     selectable={false}
   >
-    {qrCodes.map((qrCode, i) => (
-      <QRTableRow key={i} qrCode={qrCode} />
+    {qrCodes.map((qrCode) => (
+      <QRTableRow key={qrCode.id} qrCode={qrCode} />
     ))}
   </IndexTable>
 );

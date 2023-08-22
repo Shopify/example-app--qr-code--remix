@@ -1,6 +1,6 @@
 import qrcode from "qrcode";
-import db from "../db.server";
 import invariant from "tiny-invariant";
+import db from "../db.server";
 
 // [START get-qrcode]
 export async function getQRCode(id, graphql) {
@@ -28,7 +28,7 @@ export async function getQRCodes(shop, graphql) {
 // [END get-qrcode]
 
 // [START get-qrcode-image]
-export async function getQRCodeImage(id) {
+export function getQRCodeImage(id) {
   const url = new URL(`/qrcodes/${id}/scan`, process.env.SHOPIFY_APP_URL);
   return qrcode.toDataURL(url.href);
 }

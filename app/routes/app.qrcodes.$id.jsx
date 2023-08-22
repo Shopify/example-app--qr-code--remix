@@ -161,9 +161,7 @@ export default function QRCodeForm() {
                   labelHidden
                   autoComplete="off"
                   value={formState.title}
-                  onChange={(title) =>
-                    setFormState({ ...formState, title: title })
-                  }
+                  onChange={(title) => setFormState({ ...formState, title })}
                   error={errors.title}
                 />
               </VerticalStack>
