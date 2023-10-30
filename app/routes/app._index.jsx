@@ -88,7 +88,7 @@ const QRTableRow = ({ qrCode }) => (
     <IndexTable.Cell>
       {/* [START deleted] */}
       {qrCode.productDeleted ? (
-        <InlineStack align="start" gap="2">
+        <InlineStack align="start" gap="200">
           <span style={{ width: "20px" }}>
             <Icon source={DiamondAlertMajor} color="critical" />
           </span>
