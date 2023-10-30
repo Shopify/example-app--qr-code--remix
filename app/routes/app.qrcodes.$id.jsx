@@ -15,14 +15,14 @@ import {
   ChoiceList,
   Divider,
   EmptyState,
-  HorizontalStack,
+  InlineStack,
   InlineError,
   Layout,
   Page,
   Text,
   TextField,
   Thumbnail,
-  VerticalStack,
+  BlockStack,
   PageActions,
 } from "@shopify/polaris";
 import { ImageMajor } from "@shopify/polaris-icons";
@@ -147,10 +147,10 @@ export default function QRCodeForm() {
       {/* [END breadcrumbs] */}
       <Layout>
         <Layout.Section>
-          <VerticalStack gap="5">
+          <BlockStack gap="500">
             {/* [START title] */}
             <Card>
-              <VerticalStack gap="5">
+              <BlockStack gap="500">
                 <Text as={"h2"} variant="headingLg">
                   Title
                 </Text>
@@ -164,13 +164,13 @@ export default function QRCodeForm() {
                   onChange={(title) => setFormState({ ...formState, title })}
                   error={errors.title}
                 />
-              </VerticalStack>
+              </BlockStack>
             </Card>
             {/* [END title] */}
             <Card>
-              <VerticalStack gap="5">
+              <BlockStack gap="500">
                 {/* [START product] */}
-                <HorizontalStack align="space-between">
+                <InlineStack align="space-between">
                   <Text as={"h2"} variant="headingLg">
                     Product
                   </Text>
@@ -179,9 +179,9 @@ export default function QRCodeForm() {
                       Change product
                     </Button>
                   ) : null}
-                </HorizontalStack>
+                </InlineStack>
                 {formState.productId ? (
-                  <HorizontalStack blockAlign="center" gap={"5"}>
+                  <InlineStack blockAlign="center" gap={"500"}>
                     <Thumbnail
                       source={formState.productImage || ImageMajor}
                       alt={formState.productAlt}
@@ -189,9 +189,9 @@ export default function QRCodeForm() {
                     <Text as="span" variant="headingMd" fontWeight="semibold">
                       {formState.productTitle}
                     </Text>
-                  </HorizontalStack>
+                  </InlineStack>
                 ) : (
-                  <VerticalStack gap="2">
+                  <BlockStack gap="200">
                     <Button onClick={selectProduct} id="select-product">
                       Select product
                     </Button>
@@ -201,15 +201,15 @@ export default function QRCodeForm() {
                         fieldID="myFieldID"
                       />
                     ) : null}
-                  </VerticalStack>
+                  </BlockStack>
                 )}
                 {/* [END product] */}
                 <Bleed marginInline="20">
                   <Divider />
                 </Bleed>
                 {/* [START destination] */}
-                <HorizontalStack
-                  gap="5"
+                <InlineStack
+                  gap="500"
                   align="space-between"
                   blockAlign="start"
                 >
@@ -232,17 +232,17 @@ export default function QRCodeForm() {
                     error={errors.destination}
                   />
                   {qrCode.destinationUrl ? (
-                    <Button plain url={qrCode.destinationUrl} external>
+                    <Button plain url={qrCode.destinationUrl} target = "_blank">
                       Go to destination URL
                     </Button>
                   ) : null}
-                </HorizontalStack>
-              </VerticalStack>
+                </InlineStack>
+              </BlockStack>
               {/* [END destination] */}
             </Card>
-          </VerticalStack>
+          </BlockStack>
         </Layout.Section>
-        <Layout.Section secondary>
+        <Layout.Section variant="oneThird">
           {/* [START preview] */}
           <Card>
             <Text as={"h2"} variant="headingLg">
@@ -255,7 +255,7 @@ export default function QRCodeForm() {
                 Your QR code will appear here after you save
               </EmptyState>
             )}
-            <VerticalStack gap="3">
+            <BlockStack gap="300">
               <Button
                 disabled={!qrCode?.image}
                 url={qrCode?.image}
@@ -267,11 +267,11 @@ export default function QRCodeForm() {
               <Button
                 disabled={!qrCode.id}
                 url={`/qrcodes/${qrCode.id}`}
-                external
+                target = "_blank"
               >
                 Go to public URL
               </Button>
-            </VerticalStack>
+            </BlockStack>
           </Card>
           {/* [END preview] */}
         </Layout.Section>

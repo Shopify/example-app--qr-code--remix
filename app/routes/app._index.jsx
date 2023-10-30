@@ -10,7 +10,7 @@ import {
   Thumbnail,
   Text,
   Icon,
-  HorizontalStack,
+  InlineStack,
 } from "@shopify/polaris";
 
 import { getQRCodes } from "../models/QRCode.server";
@@ -88,14 +88,14 @@ const QRTableRow = ({ qrCode }) => (
     <IndexTable.Cell>
       {/* [START deleted] */}
       {qrCode.productDeleted ? (
-        <HorizontalStack align="start" gap="2">
+        <InlineStack align="start" gap="2">
           <span style={{ width: "20px" }}>
             <Icon source={DiamondAlertMajor} color="critical" />
           </span>
           <Text color="critical" as="span">
             product has been deleted
           </Text>
-        </HorizontalStack>
+        </InlineStack>
       ) : (
         truncate(qrCode.productTitle)
       )}
