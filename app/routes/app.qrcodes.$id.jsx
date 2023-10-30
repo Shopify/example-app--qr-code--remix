@@ -181,7 +181,7 @@ export default function QRCodeForm() {
                   ) : null}
                 </InlineStack>
                 {formState.productId ? (
-                  <InlineStack blockAlign="center" gap={"500"}>
+                  <InlineStack blockAlign="center" gap="500">
                     <Thumbnail
                       source={formState.productImage || ImageMajor}
                       alt={formState.productAlt}
