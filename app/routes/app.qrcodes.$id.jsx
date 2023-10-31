@@ -175,7 +175,7 @@ export default function QRCodeForm() {
                     Product
                   </Text>
                   {formState.productId ? (
-                    <Button plain onClick={selectProduct}>
+                    <Button variant="plain" onClick={selectProduct}>
                       Change product
                     </Button>
                   ) : null}
@@ -204,15 +204,11 @@ export default function QRCodeForm() {
                   </BlockStack>
                 )}
                 {/* [END product] */}
-                <Bleed marginInline="20">
+                <Bleed marginInlineStart="200" marginInlineEnd="200">
                   <Divider />
                 </Bleed>
                 {/* [START destination] */}
-                <InlineStack
-                  gap="500"
-                  align="space-between"
-                  blockAlign="start"
-                >
+                <InlineStack gap="500" align="space-between" blockAlign="start">
                   <ChoiceList
                     title="Scan destination"
                     choices={[
@@ -232,7 +228,11 @@ export default function QRCodeForm() {
                     error={errors.destination}
                   />
                   {qrCode.destinationUrl ? (
-                    <Button plain url={qrCode.destinationUrl} target = "_blank">
+                    <Button
+                      variant="plain"
+                      url={qrCode.destinationUrl}
+                      target="_blank"
+                    >
                       Go to destination URL
                     </Button>
                   ) : null}
@@ -260,14 +260,14 @@ export default function QRCodeForm() {
                 disabled={!qrCode?.image}
                 url={qrCode?.image}
                 download
-                primary
+                variant="primary"
               >
                 Download
               </Button>
               <Button
                 disabled={!qrCode.id}
                 url={`/qrcodes/${qrCode.id}`}
-                target = "_blank"
+                target="_blank"
               >
                 Go to public URL
               </Button>
