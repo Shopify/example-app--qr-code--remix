@@ -2,7 +2,7 @@
 
 name = "sageshop-app"
 client_id = "d504750fbc91ff2443dedeebadc103cc"
-application_url = "https://newspaper-thrown-bride-belgium.trycloudflare.com"
+application_url = "https://beans-capture-permalink-ca.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,10 +11,10 @@ scopes = "write_products,write_discounts"
 
 [auth]
 redirect_urls = [
-  "https://newspaper-thrown-bride-belgium.trycloudflare.com/auth/callback",
-  "https://newspaper-thrown-bride-belgium.trycloudflare.com/auth/shopify/callback",
-  "https://newspaper-thrown-bride-belgium.trycloudflare.com/api/auth/callback",
-  "https://newspaper-thrown-bride-belgium.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://beans-capture-permalink-ca.trycloudflare.com/auth/callback",
+  "https://beans-capture-permalink-ca.trycloudflare.com/auth/shopify/callback",
+  "https://beans-capture-permalink-ca.trycloudflare.com/api/auth/callback",
+  "https://beans-capture-permalink-ca.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]
