@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 
 import { getQRCodes } from "../models/QRCode.server";
-import { DiamondAlertMajor, ImageMajor } from "@shopify/polaris-icons";
+import { AlertDiamondIcon, ImageIcon } from "@shopify/polaris-icons";
 
 // [START loader]
 export async function loader({ request }) {
@@ -77,7 +77,7 @@ const QRTableRow = ({ qrCode }) => (
   <IndexTable.Row id={qrCode.id} position={qrCode.id}>
     <IndexTable.Cell>
       <Thumbnail
-        source={qrCode.productImage || ImageMajor}
+        source={qrCode.productImage || ImageIcon}
         alt={qrCode.productTitle}
         size="small"
       />
@@ -90,7 +90,7 @@ const QRTableRow = ({ qrCode }) => (
       {qrCode.productDeleted ? (
         <InlineStack align="start" gap="200">
           <span style={{ width: "20px" }}>
-            <Icon source={DiamondAlertMajor} tone="critical" />
+            <Icon source={AlertDiamondIcon} tone="critical" />
           </span>
           <Text tone="critical" as="span">
             product has been deleted
