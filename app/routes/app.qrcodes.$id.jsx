@@ -25,7 +25,7 @@ import {
   BlockStack,
   PageActions,
 } from "@shopify/polaris";
-import { ImageMajor } from "@shopify/polaris-icons";
+import { ImageIcon } from "@shopify/polaris-icons";
 
 import db from "../db.server";
 import { getQRCode, validateQRCode } from "../models/QRCode.server";
@@ -183,7 +183,7 @@ export default function QRCodeForm() {
                 {formState.productId ? (
                   <InlineStack blockAlign="center" gap="500">
                     <Thumbnail
-                      source={formState.productImage || ImageMajor}
+                      source={formState.productImage || ImageIcon}
                       alt={formState.productAlt}
                     />
                     <Text as="span" variant="headingMd" fontWeight="semibold">
