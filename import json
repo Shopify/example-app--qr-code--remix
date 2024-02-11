@@ -1,0 +1,66 @@
+import json
+import requests
+
+# Define your Shopify store details
+SHOPIFY_STORE_DOMAIN = 'your-store.myshopify.com'
+SHOPIFY_ACCESS_TOKEN = 'your-access-token'
+
+# Function to create a discount code in Shopify
+def create_discount_code(event, context):
+    # This is the data structure you'd expect from the Shopify webhook
+    product_data = event['detail']['payload']
+
+    # Logic to decide if a discount should be created based on the product update
+    # For example, create a discount if a product's title is updated.
+    if 'title' in product_data:
+        discount_code = generate_unique_discount_code()
+        create_discount_in_shopify(discount_code)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Discount code created successfully')
+    }
+
+def generate_unique_discount_code():
+    # Implement your logic to generate a unique discount code
+    return 'UNIQUECODE123'
+
+def create_discount_in_shopify(discount_code):
+    # The endpoint to create a discount code in Shopify
+    endpoint = f'https://{SHOPIFY_STORE_DOMAIN}/admin/api/2021-04/price_rules.json'
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN
+    }
+    data = {
+        "price_rule": {
+            "title": discount_code,
+            "target_type": "line_item",
+            "target_selection": "all",
+            "allocation_method": "across",
+            "value_type": "fixed_amount",
+            "value": "-10.0",
+            "customer_selection": "all",
+            "starts_at": "2023-04-14T01:00:00Z"
+        }
+    }
+    response = requests.post(endpoint, headers=headers, json=data)
+    if response.status_code == 201:
+        print('Discount code created in Shopify')
+    else:
+        print('Failed to create discount code in Shopify', response.content)
+
+# Sample event structure for testing purposes
+sample_event = {
+    'detail': {
+        'payload': {
+            'title': 'Example T-Shirt',
+            'id': 788032119674292900,
+            # ... more product details
+        }
+    }
+}
+
+# Entry point for the Lambda function
+if __name__ == "__main__":
+    create_discount_code(sample_event, None)

@@ -1,0 +1,20 @@
+import hashlib
+import os
+
+def lambda_handler(event, context):
+    # Signature Verification
+    client_secret = os.environ['HUBSPOT_CLIENT_SECRET']
+    request_method = event['httpMethod']
+    request_uri = event['path']
+    request_body = event['body'] if event['body'] else ''
+    source_string = client_secret + request_method + request_uri + request_body
+    computed_hash = hashlib.sha256(source_string.encode('utf-8')).hexdigest()
+    hubspot_signature = event['headers'].get('X-Hubspot-Signature', '')
+
+    if computed_hash != hubspot_signature:
+        return {
+            'statusCode': 403,
+            'body': 'Signature verification failed'
+        }
+
+    # ... (rest of your Lambda function logic) ...

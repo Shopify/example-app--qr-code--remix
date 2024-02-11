@@ -1,0 +1,45 @@
+import json
+import psycopg2
+import os
+import hashlib
+
+def lambda_handler(event, context):
+    # Signature Verification
+    client_secret = os.environ['HUBSPOT_CLIENT_SECRET']
+    request_method = event['httpMethod']
+    request_uri = event['path']
+    request_body = event['body']
+    source_string = client_secret + request_method + request_uri + request_body
+    computed_hash = hashlib.sha256(source_string.encode('utf-8')).hexdigest()
+    hubspot_signature = event['headers'].get('X-Hubspot-Signature')
+    if computed_hash != hubspot_signature:
+        print("Invalid signature")
+        return {'statusCode': 403, 'body': 'Signature verification failed'}
+
+    # Webhook Data Processing
+    record_data = json.loads(event["body"])
+    workflow_id = record_data["workflow_id"]
+    deal_id = record_data["object_id"]
+    deal_name = record_data["dealname"]
+    new_deal_stage = record_data["dealstage"]
+
+    # Database Credentials
+    host = os.environ['DB_HOST']
+    port = os.environ['DB_PORT']
+    user = os.environ['DB_USER']
+    password = os.environ['DB_PASSWORD']
+    database = os.environ['DB_NAME']
+
+    # Database Connection
+    conn = psycopg2.connect(host=host, port=port, user=user, password=password, database=database)
+    cur = conn.cursor()
+    try:
+        cur.execute("UPDATE deals SET stage = %s, workflow_id = %s, dealname = %s WHERE id = %s", (new_deal_stage, workflow_id, deal_name, deal_id))
+        conn.commit()
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        cur.close()
+        conn.close()
+
+    return {'statusCode': 200, 'body': 'Webhook processed successfully'}

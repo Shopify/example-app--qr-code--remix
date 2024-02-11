@@ -1,0 +1,38 @@
+ A conceptual approach on how you might update your AWS Lambda function to handle Shopify's `products/update` webhook for generating a dynamic discount code and integrating it with a HubSpot pop-up CTA.
+
+1. **Update the Lambda Function**:
+   - Listen to the Shopify `products/update` webhook.
+   - In the Lambda function, upon receiving a product update event, you would use Shopify's API to create a discount code. You’ll need to define the logic for when a discount code should be created (e.g., every update, specific product updates, etc.).
+   - Once the discount code is created, store it in a database or a cache accessible by your HubSpot pop-up CTA.
+
+2. **Integrate with HubSpot**:
+   - Since you already have a HubSpot pop-up CTA running, and presumably it can handle dynamic content, you would update the pop-up to call an endpoint that returns the latest discount code.
+   - This endpoint could be an API Gateway endpoint triggering another Lambda function or the same Lambda function with a different trigger, which fetches the latest discount code from where you stored it in step 1.
+
+3. **HubSpot Public App**:
+   - If you have a HubSpot public app set up and installed, you could leverage it to authenticate and securely communicate between HubSpot and your backend services. It's not mandatory if you're only displaying the discount code in the CTA, but it's beneficial for a more secure and integrated setup, especially if you're planning to extend functionality in the future.
+
+4. **Secure the Process**:
+   - Ensure that the discount code generation and retrieval process is secure. Use the client-secret to authenticate API calls between your services and Shopify.
+   - Make sure that the discount code is not easily discoverable by unauthorized users and that it's presented to the right customers under the right conditions.
+
+The exact code changes will depend on your current Lambda function implementation and how your HubSpot pop-up CTA is configured to receive dynamic content. If you can provide the existing Lambda function code that handles the `products/update` webhook, I can give more detailed guidance on what changes might be needed. Additionally, if you can clarify how the pop-up CTA retrieves and displays content, that would help in crafting a more precise solution
+
+
+I attempted to open the file you provided to review the Lambda function code, but it seems there is an issue with the file content being empty or not accessible. Without being able to view the contents of your Lambda function, I can only give a high-level overview and conceptual steps based on the details you've provided.
+
+To update the AWS Lambda function for creating a Shopify dynamic discount code when a product update occurs, you would generally follow these steps:
+
+1. **Capture the Product Update Event**: Your Lambda function should be triggered by the `products/update` event from Shopify, as it currently is. The function needs to parse the event details to confirm a product update has occurred and to extract any relevant data needed for the discount code generation.
+
+2. **Generate Discount Code**: Use the Shopify Admin API within the Lambda function to create a discount code. This will involve making an API call to Shopify's discount code creation endpoint, providing necessary details like the discount value, type, and validity.
+
+3. **Store Discount Code**: Once the discount code is generated, store it in a secure place, such as AWS Secrets Manager, DynamoDB, or another secure storage solution.
+
+4. **Update HubSpot Pop-up CTA**: For the HubSpot pop-up CTA, you can use the HubSpot API to update the pop-up content dynamically. If your pop-up CTA can accept dynamic content, you may have an API endpoint or some JavaScript that can pull the latest discount code from your storage solution and display it to the user.
+
+5. **Security and Configuration**: Ensure that your Lambda function securely handles the `client-secret` and any other sensitive credentials. Additionally, configure the necessary permissions so that the Lambda function can access Shopify's API and the storage solution used for the discount codes.
+
+If you want to proceed with a HubSpot public app, the app could facilitate the transfer of data between HubSpot and your AWS infrastructure. This might involve additional steps for authentication and data handling but can provide a more seamless and secure user experience.
+
+For specific code updates, you would need to provide the working code of your Lambda function. If you are still experiencing issues with the file upload, you might consider sharing the Lambda function code directly in the chat (if it's not too lengthy) or ensuring the file has contents and re-uploading it.
