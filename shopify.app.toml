@@ -1,3 +1,30 @@
-# This file stores configurations for your Shopify app.
+## Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "write_products"
+client_id = "your-client-id"
+name = "My Awesome app"
+application_url = "https://this-is-not-real.yourapp"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "your-dev-store-to-test.myshopify.com"
+include_config_on_deploy = true
+
+# [START auth.scopes-config]
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products, read_orders"
+# [END auth.scopes-config]
+
+[auth]
+redirect_urls = [
+  "https://this-is-not-real.yourapp/auth/callback",
+  "https://this-is-not-real.yourapp/auth/shopify/callback",
+  "https://this-is-not-real.yourapp/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
