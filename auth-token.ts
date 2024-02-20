@@ -1,9 +1,3 @@
-// [START auth.token-in-header]
-function getSessionTokenHeader(request) {
-  return request.headers['authorization']?.replace('Bearer ', '');
-}
-// [END auth.token-in-header]
-
 // [START auth.token-in-url-param]
 function getSessionTokenFromUrlParam(request) {
   const searchParams = new URLSearchParams(request.url);
@@ -11,6 +5,12 @@ function getSessionTokenFromUrlParam(request) {
   return searchParams.get('id_token');
 }
 // [END auth.token-in-url-param]
+
+// [START auth.token-in-header]
+function getSessionTokenHeader(request) {
+  return request.headers['authorization']?.replace('Bearer ', '');
+}
+// [END auth.token-in-header]
 
 router.get('/authorize', async function (req, res, next) {
 
