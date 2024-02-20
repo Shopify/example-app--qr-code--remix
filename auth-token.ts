@@ -32,7 +32,7 @@ router.get('/authorize', async function (req, res, next) {
   const accessToken = await shopify.auth.tokenExchange({
     shop,
     sessionToken: encodedSessionToken,
-    requestedTokenType: RequestedTokenType.OnlineAccessToken // or RequestedTokenType.OnlineAccessToken
+    requestedTokenType: RequestedTokenType.OnlineAccessToken // or RequestedTokenType.OfflineAccessToken
   });
   // [END auth.token-exchange]
 });
