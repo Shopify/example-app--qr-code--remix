@@ -14,14 +14,12 @@ function getSessionTokenFromUrlParam(request) {
 
 // [START auth.session-token-bounce-redirect]
 function redirectToSessionTokenBouncePage(req, res) {
-  const searchParamsFromOriginalQuery = new URLSearchParams(req.query);
+  const searchParams = new URLSearchParams(req.query);
   // Remove `id_token` from the query string to prevent an invalid session token sent to the redirect path.
-  searchParamsFromOriginalQuery.delete('id_token');
-
-  const searchParams = new URLSearchParams();
+  searchParams.delete('id_token');
 
   // Using shopify-reload path to redirect the bounce automatically.
-  searchParams.append('shopify-reload', `${req.path}?${searchParamsFromOriginalQuery.toString()}`);
+  searchParams.append('shopify-reload', `${req.path}?${searchParams.toString()}`);
   res.redirect(`/session-token-bounce?${searchParams.toString()}`);
 }
 
