@@ -50,10 +50,10 @@ router.get('/authorize', async function (req, res, next) {
     // "shopify" is an instance of the Shopify API library object,
     // You can install and configure the Shopify API library through: https://www.npmjs.com/package/@shopify/shopify-api
     decodedSessionToken = await shopify.session.decodeSessionToken(encodedSessionToken);
-    // [END auth.validate-session-token]
   } catch (e) {
     return redirectToSessionTokenBouncePage(req, res);
   }
+  // [END auth.validate-session-token]
 
   // [START auth.token-exchange]
   // "shopify" is an instance of the Shopify API library object,
