@@ -3,7 +3,7 @@ import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
 
 import db from "../db.server";
-import { getQRCodeImage } from "~/models/QRCode.server";
+import { getQRCodeImage } from "../models/QRCode.server";
 
 // [START loader]
 export const loader = async ({ params }) => {
