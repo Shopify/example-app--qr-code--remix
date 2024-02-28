@@ -56,8 +56,6 @@ router.get('/authorize', async function (req, res, next) {
   // [END auth.validate-session-token]
 
   // [START auth.token-exchange]
-  // "shopify" is an instance of the Shopify API library object,
-  // You can install and configure the Shopify API library through: https://www.npmjs.com/package/@shopify/shopify-api
   const dest = new URL(decodedSessionToken.dest);
   const shop = dest.hostname;
   const accessToken = await shopify.auth.tokenExchange({
