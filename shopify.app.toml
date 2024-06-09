@@ -1,5 +1,11 @@
 # This file stores configurations for your Shopify app.
+name = "Example App"
+client_id = "a61950a2cbd5f32876b0b55587ec7a27"
+application_url = "https://www.app.example.com/"
+embedded = true
+handle = "example-app"
 
+[access_scopes]
 scopes = "write_products, read_orders"
 
 [webhooks]
