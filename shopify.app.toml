@@ -5,12 +5,18 @@ application_url = "https://www.app.example.com/"
 embedded = true
 handle = "example-app"
 
+# [START get-access-scopes]
 [access_scopes]
 scopes = "write_products, read_orders"
+# [END get-access-scopes]
 
+# [START change-api-version]
 [webhooks]
 api_version = "2024-07"
+# [END change-api-version]
 
+# [START configure-subscription]
 [[webhooks.subscriptions]]
 topics = ["orders/create"]
 uri = "<YOUR-APP-URL>/webhooks"
+# [END configure-subscription]
