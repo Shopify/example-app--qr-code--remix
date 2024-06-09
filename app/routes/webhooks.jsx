@@ -2,9 +2,12 @@ import { authenticate } from "../shopify.server";
 import db from "../db.server";
 
 export const action = async ({ request }) => {
-  const { topic, shop, session } = await authenticate.webhook(request);
+  const { topic, shop, session, payload } = await authenticate.webhook(request);
 
   switch (topic) {
+    case "ORDERS_CREATE":
+      console.log("orders/create: ", payload);
+      break;
     case "APP_UNINSTALLED":
       if (session) {
         await db.session.deleteMany({ where: { shop } });
