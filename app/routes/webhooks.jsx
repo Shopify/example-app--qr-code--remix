@@ -7,7 +7,7 @@ export const action = async ({ request }) => {
   switch (topic) {
     // [START process-webhooks]
     case "ORDERS_CREATE":
-      console.log("orders/create", payload);
+      console.log("orders/create: ", payload);
       break;
     // [END process-webhooks]
     case "APP_UNINSTALLED":
