@@ -15,14 +15,26 @@ scopes = "write_products, read_orders"
 api_version = "2024-07"
 # [END change-api-version]
 
+# [START configure-subscription-pubsub]
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "pubsub://<PROJECT-ID>:<PUBSUB-TOPIC-ID>"
+# [END configure-subscription-pubsub]
+
+# [START configure-subscription-eventbridge]
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "arn:aws:events:<AWS-REGION>::event-source/aws.partner/shopify.com/<APP-ID>/<EVENT-SOURCE-NAME>"
+# [END configure-subscription-eventbridge]
+
+# [START configure-subscription-https]
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "<YOUR-HTTPS-ENDPOINT>"
+# [END configure-subscription-https]
+
 # [START configure-subscription]
 [[webhooks.subscriptions]]
 topics = ["orders/create"]
 uri = "<YOUR-APP-URL>/webhooks"
 # [END configure-subscription]
-
-# [START configure-subscription-pubsub]
-[[webhooks.subscriptions]]
-topics = ["orders/create"]
-uri = "pubsub://{project-id}:{topic-id}"
-# [END configure-subscription-pubsub]
