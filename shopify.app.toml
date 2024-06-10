@@ -1,3 +1,22 @@
 # This file stores configurations for your Shopify app.
+name = "Example App"
+client_id = "a61950a2cbd5f32876b0b55587ec7a27"
+application_url = "https://www.app.example.com/"
+embedded = true
+handle = "example-app"
 
-scopes = "write_products"
+# [START get-access-scopes]
+[access_scopes]
+scopes = "write_products, read_orders"
+# [END get-access-scopes]
+
+# [START change-api-version]
+[webhooks]
+api_version = "2024-07"
+# [END change-api-version]
+
+# [START configure-subscription]
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "pubsub://{project-id}:{topic-id}"
+# [END configure-subscription]
