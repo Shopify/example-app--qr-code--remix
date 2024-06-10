@@ -20,3 +20,9 @@ api_version = "2024-07"
 topics = ["orders/create"]
 uri = "<YOUR-APP-URL>/webhooks"
 # [END configure-subscription]
+
+# [START configure-subscription-pubsub]
+[[webhooks.subscriptions]]
+topics = ["orders/create"]
+uri = "pubsub://{project-id}:{topic-id}"
+# [END configure-subscription-pubsub]
