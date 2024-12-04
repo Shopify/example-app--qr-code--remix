@@ -36,5 +36,5 @@ uri = "arn:aws:events:<AWS-REGION>::event-source/aws.partner/shopify.com/<APP-ID
 # [START configure-subscription]
 [[webhooks.subscriptions]]
 topics = ["orders/create"]
-uri = "<YOUR-APP-URL>/webhooks"
+uri = "/webhooks/app/orders-create"
 # [END configure-subscription]
