@@ -24,7 +24,7 @@ uri = "pubsub://<PROJECT-ID>:<PUBSUB-TOPIC-ID>"
 # [START configure-subscription-https]
 [[webhooks.subscriptions]]
 topics = ["orders/create"]
-uri = "<YOUR-HTTPS-ENDPOINT>"
+uri = "/webhooks/app/orders-create"
 # [END configure-subscription-https]
 
 # [START configure-subscription-eventbridge]
@@ -32,9 +32,3 @@ uri = "<YOUR-HTTPS-ENDPOINT>"
 topics = ["orders/create"]
 uri = "arn:aws:events:<AWS-REGION>::event-source/aws.partner/shopify.com/<APP-ID>/<EVENT-SOURCE-NAME>"
 # [END configure-subscription-eventbridge]
-
-# [START configure-subscription]
-[[webhooks.subscriptions]]
-topics = ["orders/create"]
-uri = "/webhooks/app/orders-create"
-# [END configure-subscription]
