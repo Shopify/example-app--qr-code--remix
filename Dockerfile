@@ -4,6 +4,7 @@ EXPOSE 3000
 WORKDIR /app
 COPY . .
 
+RUN apk add openssl
 RUN npm install
 RUN npm run build
 
