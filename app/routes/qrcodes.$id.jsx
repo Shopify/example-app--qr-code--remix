@@ -1,4 +1,3 @@
-import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
 
@@ -14,10 +13,10 @@ export const loader = async ({ params }) => {
 
   invariant(qrCode, "Could not find QR code destination");
 
-  return json({
+  return {
     title: qrCode.title,
     image: await getQRCodeImage(id),
-  });
+  };
 };
 // [END loader]
 
