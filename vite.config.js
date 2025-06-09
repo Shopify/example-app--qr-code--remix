@@ -43,6 +43,9 @@ export default defineConfig({
   plugins: [
     remix({
       ignoredRouteFiles: ["**/.*"],
+      future: {
+        v3_singleFetch: true,
+      },
     }),
     tsconfigPaths(),
   ],
