@@ -1,13 +1,14 @@
 {
-  "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
+  "include": ["env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2019"],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "moduleResolution": "node16",
     "resolveJsonModule": true,
-    "target": "ES2019",
     "strict": true,
     "allowJs": true,
     "checkJs": true,
@@ -17,9 +18,7 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "types": [
-      "@shopify/app-bridge-types"
-    ],
+    "types": ["@shopify/app-bridge-types"],
     "noEmit": true
   }
 }
