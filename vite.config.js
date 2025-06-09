@@ -45,6 +45,7 @@ export default defineConfig({
       ignoredRouteFiles: ["**/.*"],
       future: {
         v3_singleFetch: true,
+        v3_routeConfig: true,
       },
     }),
     tsconfigPaths(),
