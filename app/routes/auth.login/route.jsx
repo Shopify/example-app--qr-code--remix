@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { json } from "@remix-run/node";
 import {
   AppProvider as PolarisAppProvider,
   Button,
@@ -22,15 +21,13 @@ export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 export async function loader({ request }) {
   const errors = loginErrorMessage(await login(request));
 
-  return json({ errors, polarisTranslations });
+  return { errors, polarisTranslations };
 }
 
 export async function action({ request }) {
   const errors = loginErrorMessage(await login(request));
 
-  return json({
-    errors,
-  });
+  return { errors };
 }
 
 export default function Auth() {

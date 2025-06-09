@@ -1,6 +1,6 @@
-import { json } from "@remix-run/node";
 import { useLoaderData, Link, useNavigate } from "@remix-run/react";
 import { authenticate } from "../shopify.server";
+import { boundary } from "@shopify/shopify-app-remix/server";
 import {
   Card,
   EmptyState,
@@ -21,9 +21,9 @@ export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
   const qrCodes = await getQRCodes(session.shop, admin.graphql);
 
-  return json({
+  return {
     qrCodes,
-  });
+  };
 }
 // [END loader]
 
@@ -136,3 +136,7 @@ export default function Index() {
   );
   // [END page]
 }
+
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
+};
