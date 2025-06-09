@@ -18,7 +18,7 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "types": ["@shopify/app-bridge-types"],
+    "types": ["@shopify/app-bridge-types", "@remix-run/node", "vite/client"],
     "noEmit": true
   }
 }
