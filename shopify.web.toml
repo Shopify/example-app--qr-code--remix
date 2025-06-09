@@ -3,6 +3,7 @@ roles = ["frontend", "backend"]
 webhooks_path = "/webhooks"
 
 [commands]
+predev = "npx prisma generate"
 dev = "npm exec remix dev"
 
 [hmr_server]
