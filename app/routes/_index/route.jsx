@@ -3,9 +3,7 @@ import { Form, useLoaderData } from "@remix-run/react";
 
 import { login } from "../../shopify.server";
 
-import indexStyles from "./style.css";
-
-export const links = () => [{ rel: "stylesheet", href: indexStyles }];
+import "./styles.css?url";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
