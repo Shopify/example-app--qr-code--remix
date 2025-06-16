@@ -1,5 +1,5 @@
 import invariant from "tiny-invariant";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 
 import db from "../db.server";
 import { getQRCodeImage } from "../models/QRCode.server";

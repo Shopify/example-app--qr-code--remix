@@ -1,6 +1,6 @@
 import { PassThrough } from "stream";
 import { renderToPipeableStream } from "react-dom/server";
-import { RemixServer } from "@remix-run/react";
+import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
 
 import { addDocumentResponseHeaders } from "./shopify.server";
@@ -19,7 +19,7 @@ export default async function handleRequest(
 
   return new Promise((resolve, reject) => {
     const { pipe, abort } = renderToPipeableStream(
-      <RemixServer context={remixContext} url={request.url} />,
+      <ServerRouter context={remixContext} url={request.url} />,
       {
         [callbackName]: () => {
           const body = new PassThrough();
