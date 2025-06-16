@@ -41,17 +41,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    reactRouter({
-      ignoredRouteFiles: ["**/.*"],
-      future: {
-        v3_singleFetch: true,
-        v3_routeConfig: true,
-        v3_lazyRouteDiscovery: true,
-        v3_throwAbortReason: true,
-        v3_relativeSplatPath: true,
-        v3_fetcherPersist: true,
-      },
-    }),
+    reactRouter(),
     tsconfigPaths(),
   ],
   build: {
