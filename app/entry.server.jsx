@@ -11,8 +11,7 @@ export default async function handleRequest(
   request,
   responseStatusCode,
   responseHeaders,
-  remixContext,
-  _loadContext
+  remixContext
 ) {
   addDocumentResponseHeaders(request, responseHeaders);
   const userAgent = request.headers.get("user-agent");
