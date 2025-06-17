@@ -44,7 +44,7 @@ Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/
 
 ### Build
 
-React Router handles building the app for you, by running the command below with the package manager of your choice:
+The build process is handled by the project's build tool, which is configured to bundle your app. You can initiate the build by running the command below with the package manager of your choice:
 
 Using yarn:
 
