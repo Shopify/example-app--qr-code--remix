@@ -1,6 +1,6 @@
-# Build a Shopify app using Remix
+# Build a Shopify app using React Router
 
-This is a Shopify app for managing QR codes. It is the code for the [Build a Shopify app using Remix tutorial](https://shopify.dev/docs/apps/getting-started/build-qr-code-app).
+This is a Shopify app for managing QR codes. It is the code for the [Build a Shopify app using React Router tutorial](https://shopify.dev/docs/apps/getting-started/build-qr-code-app).
 
 You can [follow the tutorial](https://shopify.dev/docs/apps/getting-started/build-qr-code-app), or just browse the code.
 
@@ -30,27 +30,12 @@ Using pnpm:
 
 ```shell
 pnpm install
-pnpm run setup
 ```
 
 ### Local Development
 
-Using yarn:
-
 ```shell
-yarn dev
-```
-
-Using npm:
-
-```shell
-npm run dev
-```
-
-Using pnpm:
-
-```shell
-pnpm run dev
+shopify app dev
 ```
 
 Press P to open the URL to your app. Once you click install, you can start development.
@@ -59,7 +44,7 @@ Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/
 
 ### Build
 
-Remix handles building the app for you, by running the command below with the package manager of your choice:
+The build process is handled by the project's build tool, which is configured to bundle your app. You can initiate the build by running the command below with the package manager of your choice:
 
 Using yarn:
 
@@ -87,23 +72,20 @@ When you reach the step for [setting up environment variables](https://shopify.d
 
 ## Tech Stack
 
-This template uses [Remix](https://remix.run). The following Shopify tools are also included to ease app development:
+This template uses [React Router](https://reactrouter.com/). The following Shopify tools are also included to ease development:
 
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/main/packages/shopify-app-remix/README.md) provides authentication and methods for interacting with Shopify APIs.
+- [Shopify App React Router](https://shopify.dev/docs/api/shopify-app-react-router) provides authentication and methods for interacting with Shopify APIs.
 - [Shopify App Bridge](https://shopify.dev/docs/apps/tools/app-bridge) allows your app to seamlessly integrate your app within Shopify's Admin.
 - [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
-- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
 
 > **Note**: This template runs on JavaScript, but it's fully set up for [TypeScript](https://www.typescriptlang.org/).
 > If you want to create your routes using TypeScript, we recommend removing the `noImplicitAny` config from [`tsconfig.json`](/tsconfig.json)
 
 ## Resources
 
-- [Remix Docs](https://remix.run/docs/en/v1)
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/release-candidate/packages/shopify-app-remix/README.md)
+- [React Router Docs](https://reactrouter.com/home)
+- [Shopify App React Router](https://shopify.dev/docs/api/shopify-app-react-router)
 - [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
-- [App authentication](https://shopify.dev/docs/apps/auth)
 - [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
 - [App extensions](https://shopify.dev/docs/apps/app-extensions/list)
 - [Shopify Functions](https://shopify.dev/docs/api/functions)
