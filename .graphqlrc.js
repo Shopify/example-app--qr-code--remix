@@ -1,5 +1,6 @@
 const fs = require("node:fs");
-const apiVersion = require("@shopify/shopify-app-remix").LATEST_API_VERSION;
+const apiVersion =
+  require("@shopify/shopify-app-react-router").LATEST_API_VERSION;
 
 function getConfig() {
   const config = {
