@@ -11,7 +11,7 @@ export default async function handleRequest(
   request,
   responseStatusCode,
   responseHeaders,
-  remixContext
+  context
 ) {
   addDocumentResponseHeaders(request, responseHeaders);
   const userAgent = request.headers.get("user-agent");
@@ -19,7 +19,7 @@ export default async function handleRequest(
 
   return new Promise((resolve, reject) => {
     const { pipe, abort } = renderToPipeableStream(
-      <ServerRouter context={remixContext} url={request.url} />,
+      <ServerRouter context={context} url={request.url} />,
       {
         [callbackName]: () => {
           const body = new PassThrough();
