@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { json, redirect } from "@remix-run/node";
 import {
   useActionData,
   useLoaderData,
   useNavigation,
   useSubmit,
   useNavigate,
-} from "@remix-run/react";
+} from "react-router";
 import { authenticate } from "../shopify.server";
+import { boundary } from "@shopify/shopify-app-react-router/server";
 import {
   Card,
   Bleed,
@@ -37,19 +37,19 @@ export async function loader({ request, params }) {
 
   // [START data]
   if (params.id === "new") {
-    return json({
+    return {
       destination: "product",
       title: "",
-    });
+    };
   }
 
-  return json(await getQRCode(Number(params.id), admin.graphql));
+  return await getQRCode(Number(params.id), admin.graphql);
   // [END data]
 }
 
 // [START action]
 export async function action({ request, params }) {
-  const { session } = await authenticate.admin(request);
+  const { session, redirect } = await authenticate.admin(request);
   const { shop } = session;
 
   /** @type {any} */
@@ -66,7 +66,12 @@ export async function action({ request, params }) {
   const errors = validateQRCode(data);
 
   if (errors) {
-    return json({ errors }, { status: 422 });
+    return new Response(JSON.stringify({ errors }), {
+      status: 422,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 
   const qrCode =
@@ -303,3 +308,7 @@ export default function QRCodeForm() {
   );
   // [END polaris]
 }
+
+export const headers = (headersArgs) => {
+  return boundary.headers(headersArgs);
+};

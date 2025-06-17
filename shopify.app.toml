@@ -1,3 +1,28 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
+client_id = "c2a328a966a0f6b01201ec0b2540c1b8"
+name = "example-qr-code"
+handle = "example-qr-code-9"
+application_url = "https://difficulty-promising-parameter-project.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-04"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://difficulty-promising-parameter-project.trycloudflare.com/auth/callback",
+  "https://difficulty-promising-parameter-project.trycloudflare.com/auth/shopify/callback",
+  "https://difficulty-promising-parameter-project.trycloudflare.com/api/auth/callback"
+]
+
+[pos]
+embedded = false

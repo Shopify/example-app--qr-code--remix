@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { json } from "@remix-run/node";
 import {
   AppProvider as PolarisAppProvider,
   Button,
@@ -10,8 +9,9 @@ import {
   TextField,
 } from "@shopify/polaris";
 
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import polarisStyles from "@shopify/polaris/build/esm/styles.css";
+import { Form, useActionData, useLoaderData } from "react-router";
+import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
+import polarisTranslations from "@shopify/polaris/locales/en.json";
 
 import { login } from "../../shopify.server";
 import { loginErrorMessage } from "./error.server";
@@ -21,18 +21,13 @@ export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 export async function loader({ request }) {
   const errors = loginErrorMessage(await login(request));
 
-  return json({
-    errors,
-    polarisTranslations: require(`@shopify/polaris/locales/en.json`),
-  });
+  return { errors, polarisTranslations };
 }
 
 export async function action({ request }) {
   const errors = loginErrorMessage(await login(request));
 
-  return json({
-    errors,
-  });
+  return { errors };
 }
 
 export default function Auth() {
