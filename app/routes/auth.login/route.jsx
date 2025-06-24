@@ -1,66 +1,50 @@
 import { useState } from "react";
-import {
-  AppProvider as PolarisAppProvider,
-  Button,
-  Card,
-  FormLayout,
-  Page,
-  Text,
-  TextField,
-} from "@shopify/polaris";
-
 import { Form, useActionData, useLoaderData } from "react-router";
-import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
-import polarisTranslations from "@shopify/polaris/locales/en.json";
 
 import { login } from "../../shopify.server";
+
 import { loginErrorMessage } from "./error.server";
 
-export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
-
-export async function loader({ request }) {
-  const errors = loginErrorMessage(await login(request));
-
-  return { errors, polarisTranslations };
-}
-
-export async function action({ request }) {
+export const loader = async ({ request }) => {
   const errors = loginErrorMessage(await login(request));
 
   return { errors };
-}
+};
+
+export const action = async ({ request }) => {
+  const errors = loginErrorMessage(await login(request));
+
+  return {
+    errors,
+  };
+};
 
 export default function Auth() {
-  const { polarisTranslations } = useLoaderData();
   const loaderData = useLoaderData();
   const actionData = useActionData();
   const [shop, setShop] = useState("");
   const { errors } = actionData || loaderData;
 
   return (
-    <PolarisAppProvider i18n={polarisTranslations}>
-      <Page>
-        <Card>
-          <Form method="post">
-            <FormLayout>
-              <Text variant="headingMd" as="h2">
-                Log in
-              </Text>
-              <TextField
-                type="text"
-                name="shop"
-                label="Shop domain"
-                helpText="example.myshopify.com"
-                value={shop}
-                onChange={setShop}
-                autoComplete="on"
-                error={errors.shop}
-              />
-              <Button submit>Log in</Button>
-            </FormLayout>
-          </Form>
-        </Card>
-      </Page>
-    </PolarisAppProvider>
+    <>
+      <script src="https://cdn.shopify.com/shopifycloud/app-bridge-ui-experimental.js"></script>
+      <s-page>
+        <Form method="post">
+          <s-section heading="Log in">
+            <s-text-field
+              type="text"
+              name="shop"
+              label="Shop domain"
+              helpText="example.myshopify.com"
+              value={shop}
+              onChange={setShop}
+              autoComplete="on"
+              error={errors.shop}
+            ></s-text-field>
+            <s-button submit>Log in</s-button>
+          </s-section>
+        </Form>
+      </s-page>
+    </>
   );
 }
