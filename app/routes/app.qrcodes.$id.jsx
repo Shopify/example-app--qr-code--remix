@@ -1,31 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useActionData,
   useLoaderData,
-  useNavigation,
   useSubmit,
+  useNavigation,
   useNavigate,
+  useParams,
 } from "react-router";
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
-import {
-  Card,
-  Bleed,
-  Button,
-  ChoiceList,
-  Divider,
-  EmptyState,
-  InlineStack,
-  InlineError,
-  Layout,
-  Page,
-  Text,
-  TextField,
-  Thumbnail,
-  BlockStack,
-  PageActions,
-} from "@shopify/polaris";
-import { ImageIcon } from "@shopify/polaris-icons";
 
 import db from "../db.server";
 import { getQRCode, validateQRCode } from "../models/QRCode.server";
@@ -83,23 +66,37 @@ export async function action({ request, params }) {
 }
 // [END action]
 
-// [START state]
 export default function QRCodeForm() {
-  const errors = useActionData()?.errors || {};
-
+  // [START state]
   const qrCode = useLoaderData();
+  const [initialFormState, setInitialFormState] = useState(qrCode);
   const [formState, setFormState] = useState(qrCode);
-  const [cleanFormState, setCleanFormState] = useState(qrCode);
-  const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
-
-  const nav = useNavigation();
-  const isSaving =
-    nav.state === "submitting" && nav.formData?.get("action") !== "delete";
-  const isDeleting =
-    nav.state === "submitting" && nav.formData?.get("action") === "delete";
+  const errors = useActionData()?.errors || {};
+  const navigate = useNavigate();
+  const { id } = useParams();
   // [END state]
 
-  const navigate = useNavigate();
+  // [START save-bar]
+  const isDirty =
+    JSON.stringify(formState) !== JSON.stringify(initialFormState);
+
+  useEffect(() => {
+    setInitialFormState(qrCode);
+    setFormState(qrCode);
+  }, [id]);
+
+  useEffect(() => {
+    if (isDirty) {
+      window.shopify.saveBar.show("qr-code-form");
+    } else {
+      window.shopify.saveBar.hide("qr-code-form");
+    }
+    return () => {
+      window.shopify.saveBar.hide("qr-code-form");
+    };
+  }, [isDirty]);
+
+  // [END save-bar]
 
   // [START select-product]
   async function selectProduct() {
@@ -125,6 +122,9 @@ export default function QRCodeForm() {
   // [END select-product]
 
   // [START save]
+  const nav = useNavigation();
+  const isSaving =
+    nav.state === "submitting" && nav.formData?.get("action") !== "delete";
   const submit = useSubmit();
   function handleSave() {
     const data = {
@@ -135,176 +135,204 @@ export default function QRCodeForm() {
       destination: formState.destination,
     };
 
-    setCleanFormState({ ...formState });
     submit(data, { method: "post" });
+  }
+
+  function handleReset() {
+    setFormState(initialFormState);
+    window.shopify.saveBar.hide("qr-code-form");
   }
   // [END save]
 
   // [START polaris]
   return (
-    <Page>
-      {/* [START breadcrumbs] */}
-      <ui-title-bar title={qrCode.id ? "Edit QR code" : "Create new QR code"}>
-        <button variant="breadcrumb" onClick={() => navigate("/app")}>
-          QR codes
+    <>
+      <ui-save-bar id="qr-code-form">
+        <button onClick={handleReset} disabled={isSaving}>
+          Discard
         </button>
+        <button onClick={handleSave} disabled={isSaving} variant="primary">
+          Save
+        </button>
+      </ui-save-bar>
+      <ui-title-bar title={initialFormState.title || "Add QR code"}>
+        <button variant="breadcrumb" onClick={() => isDirty ? null : navigate("/app/")}>
+          QR Codes
+        </button>
+        {initialFormState.id && (
+          <button
+            onClick={() => submit({ action: "delete" }, { method: "post" })}
+          >
+            Delete
+          </button>
+        )}
       </ui-title-bar>
-      {/* [END breadcrumbs] */}
-      <Layout>
-        <Layout.Section>
-          <BlockStack gap="500">
-            {/* [START title] */}
-            <Card>
-              <BlockStack gap="500">
-                <Text as={"h2"} variant="headingLg">
-                  Title
-                </Text>
-                <TextField
-                  id="title"
-                  helpText="Only store staff can see this title"
-                  label="title"
-                  labelHidden
-                  autoComplete="off"
-                  value={formState.title}
-                  onChange={(title) => setFormState({ ...formState, title })}
-                  error={errors.title}
-                />
-              </BlockStack>
-            </Card>
+      <form>
+        <s-page>
+          {/* [START title] */}
+          <s-section heading="QR Code information">
+            <s-text-field
+              label="tile"
+              details="Only store staff can see this title"
+              error={errors.title}
+              autoComplete="off"
+              name="title"
+              value={formState.title}
+              onInput={(e) =>
+                setFormState({ ...formState, title: e.target.value })
+              }
+            ></s-text-field>
             {/* [END title] */}
-            <Card>
-              <BlockStack gap="500">
-                {/* [START product] */}
-                <InlineStack align="space-between">
-                  <Text as={"h2"} variant="headingLg">
-                    Product
-                  </Text>
-                  {formState.productId ? (
-                    <Button variant="plain" onClick={selectProduct}>
-                      Change product
-                    </Button>
-                  ) : null}
-                </InlineStack>
-                {formState.productId ? (
-                  <InlineStack blockAlign="center" gap="500">
-                    <Thumbnail
-                      source={formState.productImage || ImageIcon}
-                      alt={formState.productAlt}
-                    />
-                    <Text as="span" variant="headingMd" fontWeight="semibold">
+            {/* [START destination] */}
+            <s-stack gap="500" align="space-between" blockAlign="start">
+              <s-select
+                name="destination"
+                label="Scan destination"
+                value={formState.destination}
+                onChange={(e) =>
+                  setFormState({ ...formState, destination: e.target.value })
+                }
+              >
+                <s-option
+                  value="product"
+                  selected={formState.destination === "product"}
+                >
+                  Link to product page
+                </s-option>
+                <s-option
+                  value="cart"
+                  selected={formState.destination === "cart"}
+                >
+                  Link to checkout page with product in the cart
+                </s-option>
+              </s-select>
+              {initialFormState.destinationUrl ? (
+                <s-link
+                  variant="plain"
+                  href={initialFormState.destinationUrl}
+                  target="_blank"
+                >
+                  Go to destination URL
+                </s-link>
+              ) : null}
+            </s-stack>
+            {/* [END destination] */}
+          </s-section>
+          {/* [START product] */}
+          <s-section heading="Product">
+            <s-stack gap="base">
+              <s-grid
+                gridTemplateColumns="1fr auto"
+                gap="base"
+                alignItems="center"
+              >
+                <s-grid-item>
+                  <s-search-field
+                    onClick={selectProduct}
+                    label="Search products"
+                    labelAccessibilityVisibility="exclusive"
+                    placeholder="Search products"
+                    autoComplete="off"
+                  ></s-search-field>
+                </s-grid-item>
+                <s-grid-item>
+                  <s-button onClick={selectProduct}>Browse</s-button>
+                </s-grid-item>
+              </s-grid>
+              {formState.productId ? (
+                <s-box
+                  padding="base"
+                  border="none"
+                  borderRadius="base"
+                  background="subdued"
+                >
+                  <s-stack direction="inline" gap="small" alignItems="center">
+                    <s-box blockSize="20px" inlineSize="20px">
+                      {formState.productImage ? (
+                        <s-image
+                          objectFit="cover"
+                          src={formState.productImage}
+                        ></s-image>
+                      ) : (
+                        <s-icon size="large" type="image" />
+                      )}
+                    </s-box>
+                    <s-link
+                      href={`shopify://admin/products/${formState.productId
+                        .split("/")
+                        .at(-1)}`}
+                    >
                       {formState.productTitle}
-                    </Text>
-                  </InlineStack>
-                ) : (
-                  <BlockStack gap="200">
-                    <Button onClick={selectProduct} id="select-product">
-                      Select product
-                    </Button>
-                    {errors.productId ? (
-                      <InlineError
-                        message={errors.productId}
-                        fieldID="myFieldID"
-                      />
-                    ) : null}
-                  </BlockStack>
-                )}
-                {/* [END product] */}
-                <Bleed marginInlineStart="200" marginInlineEnd="200">
-                  <Divider />
-                </Bleed>
-                {/* [START destination] */}
-                <InlineStack gap="500" align="space-between" blockAlign="start">
-                  <ChoiceList
-                    title="Scan destination"
-                    choices={[
-                      { label: "Link to product page", value: "product" },
-                      {
-                        label: "Link to checkout page with product in the cart",
-                        value: "cart",
-                      },
-                    ]}
-                    selected={[formState.destination]}
-                    onChange={(destination) =>
-                      setFormState({
-                        ...formState,
-                        destination: destination[0],
-                      })
-                    }
-                    error={errors.destination}
-                  />
-                  {qrCode.destinationUrl ? (
-                    <Button
-                      variant="plain"
-                      url={qrCode.destinationUrl}
+                    </s-link>
+                  </s-stack>
+                </s-box>
+              ) : null}
+            </s-stack>
+          </s-section>
+          {/* [END product] */}
+          {/* [START preview] */}
+          <s-box slot="aside">
+            {initialFormState.image ? (
+              <s-section variant="oneThird" heading="Preview">
+                <s-stack gap="base">
+                  <s-box
+                    padding="base"
+                    border="none"
+                    borderRadius="base"
+                    background="subdued"
+                  >
+                    <s-image
+                      aspectRatio="1/0.8"
+                      src={initialFormState.image}
+                      alt="The QR Code for the current form"
+                    />
+                  </s-box>
+                  <s-stack
+                    gap="small"
+                    direction="inline"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <s-button
+                      disabled={!initialFormState.id}
+                      href={`/qrcodes/${initialFormState.id}`}
                       target="_blank"
                     >
-                      Go to destination URL
-                    </Button>
-                  ) : null}
-                </InlineStack>
-              </BlockStack>
-              {/* [END destination] */}
-            </Card>
-          </BlockStack>
-        </Layout.Section>
-        <Layout.Section variant="oneThird">
-          {/* [START preview] */}
-          <Card>
-            <Text as={"h2"} variant="headingLg">
-              QR code
-            </Text>
-            {qrCode ? (
-              <EmptyState image={qrCode.image} imageContained={true} />
+                      Go to public URL
+                    </s-button>
+                    <s-button
+                      disabled={!initialFormState?.image}
+                      href={initialFormState?.image}
+                      download
+                      variant="primary"
+                    >
+                      Download
+                    </s-button>
+                  </s-stack>
+                </s-stack>
+              </s-section>
             ) : (
-              <EmptyState image="">
-                Your QR code will appear here after you save
-              </EmptyState>
+              <s-section variant="oneThird" heading="">
+                <s-grid
+                  gap="base"
+                  justifyItems="center"
+                  paddingBlock="large-400"
+                >
+                  <s-box maxInlineSize="200px" maxBlockSize="200px">
+                    <s-image
+                      aspectRatio="1/0.5"
+                      src="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+                      alt="A stylized graphic of a document"
+                    />
+                  </s-box>
+                </s-grid>
+              </s-section>
             )}
-            <BlockStack gap="300">
-              <Button
-                disabled={!qrCode?.image}
-                url={qrCode?.image}
-                download
-                variant="primary"
-              >
-                Download
-              </Button>
-              <Button
-                disabled={!qrCode.id}
-                url={`/qrcodes/${qrCode.id}`}
-                target="_blank"
-              >
-                Go to public URL
-              </Button>
-            </BlockStack>
-          </Card>
+          </s-box>
           {/* [END preview] */}
-        </Layout.Section>
-        {/* [START actions] */}
-        <Layout.Section>
-          <PageActions
-            secondaryActions={[
-              {
-                content: "Delete",
-                loading: isDeleting,
-                disabled: !qrCode.id || !qrCode || isSaving || isDeleting,
-                destructive: true,
-                outline: true,
-                onAction: () =>
-                  submit({ action: "delete" }, { method: "post" }),
-              },
-            ]}
-            primaryAction={{
-              content: "Save",
-              loading: isSaving,
-              disabled: !isDirty || isSaving || isDeleting,
-              onAction: handleSave,
-            }}
-          />
-        </Layout.Section>
-        {/* [END actions] */}
-      </Layout>
-    </Page>
+        </s-page>
+      </form>
+    </>
   );
   // [END polaris]
 }
