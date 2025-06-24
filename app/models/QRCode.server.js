@@ -56,10 +56,14 @@ async function supplementQRCode(qrCode, graphql) {
       query supplementQRCode($id: ID!) {
         product(id: $id) {
           title
-          images(first: 1) {
+          media(first: 1) {
             nodes {
-              altText
-              url
+              preview {
+                image {
+                  altText
+                  url
+                }
+              }
             }
           }
         }
@@ -80,8 +84,8 @@ async function supplementQRCode(qrCode, graphql) {
     ...qrCode,
     productDeleted: !product?.title,
     productTitle: product?.title,
-    productImage: product?.images?.nodes[0]?.url,
-    productAlt: product?.images?.nodes[0]?.altText,
+    productImage: product?.media?.nodes[0]?.preview?.image?.url,
+    productAlt: product?.media?.nodes[0]?.preview?.image?.altText,
     destinationUrl: getDestinationUrl(qrCode),
     image: await qrCodeImagePromise,
   };
