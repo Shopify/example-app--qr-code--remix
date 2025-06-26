@@ -1,15 +1,8 @@
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "@remix-run/react";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 export default function App() {
   return (
-    <html>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -19,7 +12,6 @@ export default function App() {
       <body>
         <Outlet />
         <ScrollRestoration />
-        <LiveReload />
         <Scripts />
       </body>
     </html>
