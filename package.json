@@ -1,8 +1,9 @@
 {
   "name": "app",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "NODE_ENV=production remix build",
+    "build": "vite build && vite build --ssr",
     "predev": "prisma generate && prisma migrate deploy",
     "dev": "shopify app dev",
     "config:link": "shopify app config link",
@@ -11,24 +12,24 @@
     "deploy": "shopify app deploy",
     "config:use": "shopify app config use",
     "env": "shopify app env",
-    "start": "remix-serve build",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
+    "start": "react-router-serve ./build/server/index.js",
+    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "shopify": "shopify",
     "prisma": "prisma",
     "setup": "prisma generate && prisma migrate deploy"
   },
+  "engines": {
+    "node": ">=20.10.0"
+  },
   "dependencies": {
     "@prisma/client": "^5.8.0",
-    "@remix-run/node": "^1.19.1",
-    "@remix-run/react": "^1.19.1",
-    "@remix-run/serve": "^1.19.1",
-    "@shopify/app": "^3.48",
+    "@react-router/fs-routes": "^7.0.0",
+    "@react-router/node": "^7.0.0",
+    "@react-router/serve": "^7.0.0",
     "@shopify/app-bridge-types": "^0.0.3",
-    "@shopify/cli": "^3.48",
     "@shopify/polaris": "^12.0.0",
     "@shopify/polaris-icons": "^8.0.0",
-    "@shopify/shopify-api": "^9.0.2",
-    "@shopify/shopify-app-remix": "^2.4.0",
+    "@shopify/shopify-app-react-router": "file:/Users/richardpowell/src/github.com/Shopify/shopify-app-js/packages/apps/shopify-app-react-router",
     "@shopify/shopify-app-session-storage-prisma": "^3.0.0",
     "cross-env": "^7.0.3",
     "isbot": "^4.1.0",
@@ -36,20 +37,29 @@
     "qrcode": "^1.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tiny-invariant": "^1.3.1"
+    "react-router": "^7.0.0",
+    "tiny-invariant": "^1.3.1",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.19.1",
-    "@remix-run/eslint-config": "^1.19.1",
+    "@react-router/dev": "^7.0.0",
     "@types/eslint": "^8.40.0",
     "@types/qrcode": "^1.5.0",
-    "eslint": "^8.42.0",
-    "eslint-config-prettier": "^8.8.0",
-    "prettier": "^2.8.8"
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.38.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.8.8",
+    "vite": "^6.3.5"
   },
   "workspaces": {
     "packages": [
       "extensions/*"
     ]
-  }
+  },
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }
