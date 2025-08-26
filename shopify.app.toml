@@ -24,7 +24,7 @@ uri = "pubsub://<PROJECT-ID>:<PUBSUB-TOPIC-ID>"
 # [START configure-subscription-https]
 [[webhooks.subscriptions]]
 topics = ["orders/create"]
-uri = "/webhooks/app/orders-create"
+uri = "/webhooks/app/order-create"
 # [END configure-subscription-https]
 
 # [START configure-subscription-eventbridge]
