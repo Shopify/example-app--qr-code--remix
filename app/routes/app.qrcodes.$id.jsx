@@ -159,30 +159,20 @@ export default function QRCodeForm() {
 
   return (
     <>
-      <ui-save-bar id="qr-code-form">
-        <button onClick={handleReset} disabled={isSaving}>
-          Discard
-        </button>
-        <button onClick={handleSave} disabled={isSaving} variant="primary">
-          Save
-        </button>
-      </ui-save-bar>
-      {/* [END save-bar] */}
-      {/* [START breadcrumbs] */}
-      <ui-title-bar title={initialFormState.title || "Create QR code"}>
-        <Link
-          to="/app"
-          variant="breadcrumb"
-          onClick={(e) => (isDirty ? e.preventDefault() : navigate("/app/"))}
-        >
-          QR Codes
-        </Link>
-        {initialFormState.id && <button onClick={handleDelete}>Delete</button>}
-      </ui-title-bar>
-      {/* [END breadcrumbs] */}
-      <form>
+      <form data-save-bar onSubmit={handleSave} onReset={handleReset}>
         {/* [START polaris] */}
-        <s-page>
+        <s-page heading={initialFormState.title || "Create QR code"}>
+          {/* [START breadcrumbs] */}
+          <s-link
+            href="/app"
+            slot="breadcrumb-actions"
+            onClick={(e) => (isDirty ? e.preventDefault() : navigate("/app/"))}
+          >
+          {/* [END breadcrumbs] */}
+            QR Codes
+          </s-link>
+          {initialFormState.id &&
+            <s-button slot="secondary-actions" onClick={handleDelete}>Delete</s-button>}
           <s-section heading="QR Code information">
             <s-stack gap="base">
               {/* [START title] */}

@@ -121,12 +121,10 @@ export default function Index() {
 
   // [START page]
   return (
-    <s-page>
-      <ui-title-bar title="QR codes">
-        <Link variant="primary" to="/app/qrcodes/new">
-          Create QR code
-        </Link>
-      </ui-title-bar>
+    <s-page heading="QR codes">
+      <s-link slot="secondary-actions" href="/app/qrcodes/new">
+        Create QR code
+      </s-link>
       {qrCodes.length === 0 ? (
         <EmptyQRCodeState />
       ) : (
