@@ -1,5 +1,7 @@
+// [START template.app-show]
 % shopify app env show
 
     SHOPIFY_API_KEY=YOUR_API_KEY_HERE
     SHOPIFY_API_SECRET=YOUR_API_SECRET_HERE
     SCOPES=write_products
+// [END template.app-show]
