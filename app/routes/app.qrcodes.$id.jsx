@@ -118,7 +118,9 @@ export default function QRCodeForm() {
   // [START use-submit]
   const submit = useSubmit();
 
-  function handleSave() {
+  function handleSave(event) {
+    event.preventDefault();
+
     const data = {
       title: formState.title,
       productId: formState.productId || "",
@@ -136,7 +138,8 @@ export default function QRCodeForm() {
   // [END use-submit]
 
   // [START save-bar]
-  function handleReset() {
+  function handleReset(event) {
+    event.preventDefault();
     setFormState(initialFormState);
     window.shopify.saveBar.hide("qr-code-form");
   }
