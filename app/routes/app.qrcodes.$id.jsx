@@ -6,7 +6,6 @@ import {
   useNavigation,
   useNavigate,
   useParams,
-  Link,
 } from "react-router";
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
@@ -118,7 +117,9 @@ export default function QRCodeForm() {
   // [START use-submit]
   const submit = useSubmit();
 
-  function handleSave() {
+  function handleSave(e) {
+    e.preventDefault();
+
     const data = {
       title: formState.title,
       productId: formState.productId || "",
@@ -130,7 +131,8 @@ export default function QRCodeForm() {
     submit(data, { method: "post" });
   }
 
-  function handleDelete() {
+  function handleDelete(e) {
+    e.preventDefault();
     submit({ action: "delete" }, { method: "post" });
   }
   // [END use-submit]
