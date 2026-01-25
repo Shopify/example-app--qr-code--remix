@@ -1,27 +1,30 @@
 import { redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
-import db from "../db.server";
 
+import { unauthenticated } from "../shopify.server";
+import { getQRCodeById, incrementQRCodeScans } from "../models/qrcode.repository";
 import { getDestinationUrl } from "../models/QRCode.server";
 
-export const loader = async ({ params }) => {
+export const loader = async ({ params, request }) => {
   // [START validate]
   invariant(params.id, "Could not find QR code destination");
 
-  const id = Number(params.id);
-  const qrCode = await db.qRCode.findFirst({ where: { id } });
+  const url = new URL(request.url);
+  const shop = url.searchParams.get("shop");
+  invariant(shop, "Shop parameter is required");
+
+  const { admin } = await unauthenticated.admin(shop);
+  const gid = `gid://shopify/Metaobject/${params.id}`;
+  const qrCode = await getQRCodeById(admin.graphql, gid);
 
   invariant(qrCode, "Could not find QR code destination");
   // [END validate]
 
   // [START increment]
-  await db.qRCode.update({
-    where: { id },
-    data: { scans: { increment: 1 } },
-  });
+  await incrementQRCodeScans(admin.graphql, gid);
   // [END increment]
 
   // [START redirect]
-  return redirect(getDestinationUrl(qrCode));
+  return redirect(getDestinationUrl(qrCode, shop));
   // [END redirect]
 };

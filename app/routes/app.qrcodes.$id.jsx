@@ -27,12 +27,23 @@ import {
 } from "@shopify/polaris";
 import { ImageIcon } from "@shopify/polaris-icons";
 
-import db from "../db.server";
 import { getQRCode, validateQRCode } from "../models/QRCode.server";
+import {
+  createQRCode,
+  updateQRCode,
+  deleteQRCode,
+} from "../models/qrcode.repository";
+
+function extractIdFromGid(gid) {
+  if (!gid || typeof gid !== "string") return gid;
+  const match = gid.match(/Metaobject\/(\d+)/);
+  return match ? match[1] : gid;
+}
 
 export async function loader({ request, params }) {
   // [START authenticate]
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
+  const { shop } = session;
   // [END authenticate]
 
   // [START data]
@@ -43,23 +54,26 @@ export async function loader({ request, params }) {
     });
   }
 
-  return json(await getQRCode(Number(params.id), admin.graphql));
+  // Convert numeric ID to GID format for metaobject lookup
+  const gid = `gid://shopify/Metaobject/${params.id}`;
+  return json(await getQRCode(gid, admin.graphql, shop));
   // [END data]
 }
 
 // [START action]
 export async function action({ request, params }) {
-  const { session } = await authenticate.admin(request);
-  const { shop } = session;
+  const { admin } = await authenticate.admin(request);
 
   /** @type {any} */
   const data = {
     ...Object.fromEntries(await request.formData()),
-    shop,
   };
 
+  // Convert numeric ID to GID format for metaobject operations
+  const gid = params.id !== "new" ? `gid://shopify/Metaobject/${params.id}` : null;
+
   if (data.action === "delete") {
-    await db.qRCode.delete({ where: { id: Number(params.id) } });
+    await deleteQRCode(admin.graphql, gid);
     return redirect("/app");
   }
 
@@ -69,12 +83,22 @@ export async function action({ request, params }) {
     return json({ errors }, { status: 422 });
   }
 
+  const qrCodeData = {
+    title: data.title,
+    productId: data.productId,
+    productHandle: data.productHandle,
+    productVariantId: data.productVariantId,
+    destination: data.destination,
+  };
+
   const qrCode =
     params.id === "new"
-      ? await db.qRCode.create({ data })
-      : await db.qRCode.update({ where: { id: Number(params.id) }, data });
+      ? await createQRCode(admin.graphql, qrCodeData)
+      : await updateQRCode(admin.graphql, gid, qrCodeData);
 
-  return redirect(`/app/qrcodes/${qrCode.id}`);
+  // Extract the numeric ID from the GID for the redirect URL
+  const idForUrl = extractIdFromGid(qrCode.id);
+  return redirect(`/app/qrcodes/${idForUrl}`);
 }
 // [END action]
 
@@ -266,7 +290,7 @@ export default function QRCodeForm() {
               </Button>
               <Button
                 disabled={!qrCode.id}
-                url={`/qrcodes/${qrCode.id}`}
+                url={`/qrcodes/${qrCode.id?.match?.(/Metaobject\/(\d+)/)?.[1] || qrCode.id}?shop=${qrCode.shop || ""}`}
                 target="_blank"
               >
                 Go to public URL
