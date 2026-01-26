@@ -16,6 +16,12 @@ import {
 import { getQRCodes } from "../models/QRCode.server";
 import { AlertDiamondIcon, ImageIcon } from "@shopify/polaris-icons";
 
+function extractIdFromGid(gid) {
+  if (!gid || typeof gid !== "string") return gid;
+  const match = gid.match(/Metaobject\/(\d+)/);
+  return match ? match[1] : gid;
+}
+
 // [START loader]
 export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
@@ -66,7 +72,7 @@ const QRTable = ({ qrCodes }) => (
     selectable={false}
   >
     {qrCodes.map((qrCode) => (
-      <QRTableRow key={qrCode.id} qrCode={qrCode} />
+      <QRTableRow key={extractIdFromGid(qrCode.id)} qrCode={qrCode} />
     ))}
   </IndexTable>
 );
@@ -74,7 +80,7 @@ const QRTable = ({ qrCodes }) => (
 
 // [START row]
 const QRTableRow = ({ qrCode }) => (
-  <IndexTable.Row id={qrCode.id} position={qrCode.id}>
+  <IndexTable.Row id={extractIdFromGid(qrCode.id)} position={extractIdFromGid(qrCode.id)}>
     <IndexTable.Cell>
       <Thumbnail
         source={qrCode.productImage || ImageIcon}
@@ -83,7 +89,7 @@ const QRTableRow = ({ qrCode }) => (
       />
     </IndexTable.Cell>
     <IndexTable.Cell>
-      <Link to={`qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
+      <Link to={`qrcodes/${extractIdFromGid(qrCode.id)}`}>{truncate(qrCode.title)}</Link>
     </IndexTable.Cell>
     <IndexTable.Cell>
       {/* [START deleted] */}
