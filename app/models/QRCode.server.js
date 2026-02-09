@@ -11,7 +11,7 @@ export async function getQRCode(handle, graphql, shop) {
         metaobjectByHandle(handle: $handle) {
           id
           handle
-          createdAt
+          updatedAt
           title: field(key: "title") { jsonValue }
           product: field(key: "product") {
             jsonValue
@@ -64,7 +64,7 @@ export async function getQRCodes(graphql, shop) {
           nodes {
             id
             handle
-            createdAt
+            updatedAt
             title: field(key: "title") { jsonValue }
             product: field(key: "product") {
               jsonValue
@@ -101,11 +101,11 @@ export async function getQRCodes(graphql, shop) {
   const { data } = await response.json();
   const metaobjects = data?.metaobjects?.nodes ?? [];
 
-  return metaobjects.map((mo) => transformMetaobject(mo, shop));
+  return Promise.all(metaobjects.map((mo) => transformMetaobject(mo, shop)));
 }
 // [END get-qrcode]
 
-function transformMetaobject(metaobject, shop) {
+async function transformMetaobject(metaobject, shop) {
   const product = metaobject.product?.reference;
   const variant = metaobject.productVariant?.reference;
   const productId = metaobject.product?.jsonValue;
@@ -120,7 +120,7 @@ function transformMetaobject(metaobject, shop) {
     productVariantLegacyId: variant?.legacyResourceId,
     destination: metaobject.destination?.jsonValue,
     scans: metaobject.scans?.jsonValue ?? 0,
-    createdAt: metaobject.createdAt,
+    createdAt: metaobject.updatedAt,
     productDeleted: productId && !product,
     productTitle: product?.title,
     productImage: product?.media?.nodes[0]?.preview?.image?.url,
@@ -128,13 +128,13 @@ function transformMetaobject(metaobject, shop) {
   };
 
   qrCode.destinationUrl = getDestinationUrl(qrCode, shop);
-  qrCode.image = getQRCodeImage(metaobject.handle, shop);
+  qrCode.image = await getQRCodeImage(metaobject.handle, shop);
 
   return qrCode;
 }
 
 // [START get-qrcode-image]
-export function getQRCodeImage(handle, shop) {
+export async function getQRCodeImage(handle, shop) {
   const url = new URL(
     `/qrcodes/${handle}/scan`,
     process.env.SHOPIFY_APP_URL,
