@@ -12,9 +12,9 @@ export async function getQRCode(handle, graphql, shop) {
           id
           handle
           createdAt
-          title: field(key: "title") { value }
+          title: field(key: "title") { jsonValue }
           product: field(key: "product") {
-            value
+            jsonValue
             reference {
               ... on Product {
                 handle
@@ -29,9 +29,13 @@ export async function getQRCode(handle, graphql, shop) {
               }
             }
           }
-          productVariant: field(key: "product_variant") { value }
-          destination: field(key: "destination") { value }
-          scans: field(key: "scans") { value }
+          productVariant: field(key: "product_variant") {
+            reference {
+              ... on ProductVariant { id legacyResourceId }
+            }
+          }
+          destination: field(key: "destination") { jsonValue }
+          scans: field(key: "scans") { jsonValue }
         }
       }
     `,
@@ -61,9 +65,9 @@ export async function getQRCodes(graphql, shop) {
             id
             handle
             createdAt
-            title: field(key: "title") { value }
+            title: field(key: "title") { jsonValue }
             product: field(key: "product") {
-              value
+              jsonValue
               reference {
                 ... on Product {
                   handle
@@ -78,9 +82,13 @@ export async function getQRCodes(graphql, shop) {
                 }
               }
             }
-            productVariant: field(key: "product_variant") { value }
-            destination: field(key: "destination") { value }
-            scans: field(key: "scans") { value }
+            productVariant: field(key: "product_variant") {
+              reference {
+                ... on ProductVariant { id legacyResourceId }
+              }
+            }
+            destination: field(key: "destination") { jsonValue }
+            scans: field(key: "scans") { jsonValue }
           }
         }
       }
@@ -99,21 +107,19 @@ export async function getQRCodes(graphql, shop) {
 
 function transformMetaobject(metaobject, shop) {
   const product = metaobject.product?.reference;
-  const productHandle = product?.handle;
-  const productId = metaobject.product?.value;
-  const productVariantId = metaobject.productVariant?.value;
-  const destination = metaobject.destination?.value;
-  const scans = parseInt(metaobject.scans?.value || "0", 10);
+  const variant = metaobject.productVariant?.reference;
+  const productId = metaobject.product?.jsonValue;
 
   const qrCode = {
     id: metaobject.id,
     handle: metaobject.handle,
-    title: metaobject.title?.value,
+    title: metaobject.title?.jsonValue,
     productId,
-    productVariantId,
-    productHandle,
-    destination,
-    scans,
+    productVariantId: variant?.id,
+    productHandle: product?.handle,
+    productVariantLegacyId: variant?.legacyResourceId,
+    destination: metaobject.destination?.jsonValue,
+    scans: metaobject.scans?.jsonValue ?? 0,
     createdAt: metaobject.createdAt,
     productDeleted: productId && !product,
     productTitle: product?.title,
@@ -144,11 +150,9 @@ export function getDestinationUrl(qrCode, shop) {
     return `https://${shop}/products/${qrCode.productHandle}`;
   }
 
-  const match =
-    /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
-  invariant(match, "Unrecognised product variant ID");
+  invariant(qrCode.productVariantLegacyId, "Unrecognised product variant ID");
 
-  return `https://${shop}/cart/${match[1]}:1`;
+  return `https://${shop}/cart/${qrCode.productVariantLegacyId}:1`;
 }
 // [END get-destination]
 

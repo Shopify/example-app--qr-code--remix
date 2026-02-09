@@ -20,3 +20,5 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+// QR code data is now stored in metaobjects ($app:qrcode) — see shopify.app.toml

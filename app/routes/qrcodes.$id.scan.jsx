@@ -29,9 +29,13 @@ export const loader = async ({ request, params }) => {
               ... on Product { handle }
             }
           }
-          productVariant: field(key: "product_variant") { value }
-          destination: field(key: "destination") { value }
-          scans: field(key: "scans") { value }
+          productVariant: field(key: "product_variant") {
+            reference {
+              ... on ProductVariant { legacyResourceId }
+            }
+          }
+          destination: field(key: "destination") { jsonValue }
+          scans: field(key: "scans") { jsonValue }
         }
       }
     `,
@@ -48,15 +52,15 @@ export const loader = async ({ request, params }) => {
   // [END fetch]
 
   // [START increment]
-  const currentScans = parseInt(metaobject.scans?.value || "0", 10);
+  const currentScans = metaobject.scans?.jsonValue ?? 0;
   await incrementQRCodeScans(metaobject.id, currentScans, admin.graphql);
   // [END increment]
 
   // [START redirect]
   const qrCode = {
-    destination: metaobject.destination?.value,
+    destination: metaobject.destination?.jsonValue,
     productHandle: metaobject.product?.reference?.handle,
-    productVariantId: metaobject.productVariant?.value,
+    productVariantLegacyId: metaobject.productVariant?.reference?.legacyResourceId,
   };
 
   return redirect(getDestinationUrl(qrCode, shop));
