@@ -20,18 +20,3 @@ model Session {
   accessToken String
   userId      BigInt?
 }
-
-// [START qrcode-model]
-model QRCode {
-  id               Int      @id @default(autoincrement())
-  title            String
-  shop             String
-  productId        String
-  productHandle    String
-  productVariantId String
-  destination      String
-  scans            Int      @default(0)
-  createdAt        DateTime @default(now())
-}
-
-// [END qrcode-model]

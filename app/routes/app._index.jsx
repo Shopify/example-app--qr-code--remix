@@ -7,7 +7,7 @@ import { getQRCodes } from "../models/QRCode.server";
 // [START loader]
 export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
-  const qrCodes = await getQRCodes(session.shop, admin.graphql);
+  const qrCodes = await getQRCodes(admin.graphql, session.shop);
 
   return {
     qrCodes,
@@ -66,7 +66,7 @@ const QRTable = ({ qrCodes }) => (
       </s-table-header-row>
       <s-table-body>
         {qrCodes.map((qrCode) => (
-          <QRTableRow key={qrCode.id} qrCode={qrCode} />
+          <QRTableRow key={qrCode.handle} qrCode={qrCode} />
         ))}
       </s-table-body>
     </s-table>
@@ -76,11 +76,11 @@ const QRTable = ({ qrCodes }) => (
 
 // [START row]
 const QRTableRow = ({ qrCode }) => (
-  <s-table-row id={qrCode.id} position={qrCode.id}>
+  <s-table-row id={qrCode.handle}>
     <s-table-cell>
       <s-stack direction="inline" gap="small" alignItems="center">
         <s-clickable
-          href={`/app/qrcodes/${qrCode.id}`}
+          href={`/app/qrcodes/${qrCode.handle}`}
           accessibilityLabel={`Go to the product page for ${qrCode.productTitle}`}
           border="base"
           borderRadius="base"
@@ -94,7 +94,7 @@ const QRTableRow = ({ qrCode }) => (
             <s-icon size="large" type="image" />
           )}
         </s-clickable>
-        <s-link href={`/app/qrcodes/${qrCode.id}`}>
+        <s-link href={`/app/qrcodes/${qrCode.handle}`}>
           {truncate(qrCode.title)}
         </s-link>
       </s-stack>

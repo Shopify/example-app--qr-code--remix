@@ -10,12 +10,17 @@ import {
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 
-import db from "../db.server";
-import { getQRCode, validateQRCode } from "../models/QRCode.server";
+import {
+  getQRCode,
+  validateQRCode,
+  saveQRCode,
+  deleteQRCode,
+  generateHandle,
+} from "../models/QRCode.server";
 
 export async function loader({ request, params }) {
   // [START authenticate]
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   // [END authenticate]
 
   // [START data]
@@ -23,26 +28,26 @@ export async function loader({ request, params }) {
     return {
       destination: "product",
       title: "",
+      shop: session.shop,
     };
   }
 
-  return await getQRCode(Number(params.id), admin.graphql);
+  const qrCode = await getQRCode(params.id, admin.graphql, session.shop);
+  return { ...qrCode, shop: session.shop };
   // [END data]
 }
 
 // [START action]
 export async function action({ request, params }) {
-  const { session, redirect } = await authenticate.admin(request);
-  const { shop } = session;
+  const { session, admin, redirect } = await authenticate.admin(request);
 
   /** @type {any} */
   const data = {
     ...Object.fromEntries(await request.formData()),
-    shop,
   };
 
   if (data.action === "delete") {
-    await db.qRCode.delete({ where: { id: Number(params.id) } });
+    await deleteQRCode(data.metaobjectId, admin.graphql);
     return redirect("/app");
   }
 
@@ -57,12 +62,12 @@ export async function action({ request, params }) {
     });
   }
 
-  const qrCode =
-    params.id === "new"
-      ? await db.qRCode.create({ data })
-      : await db.qRCode.update({ where: { id: Number(params.id) }, data });
+  const handle =
+    params.id === "new" ? generateHandle(data.title) : params.id;
 
-  return redirect(`/app/qrcodes/${qrCode.id}`);
+  const metaobject = await saveQRCode(handle, data, admin.graphql);
+
+  return redirect(`/app/qrcodes/${metaobject.handle}`);
 }
 // [END action]
 
@@ -71,7 +76,8 @@ export default function QRCodeForm() {
   const { id } = useParams();
 
   // [START state]
-  const qrCode = useLoaderData();
+  const loaderData = useLoaderData();
+  const qrCode = loaderData;
   const [initialFormState, setInitialFormState] = useState(qrCode);
   const [formState, setFormState] = useState(qrCode);
   const errors = useActionData()?.errors || {};
@@ -95,7 +101,6 @@ export default function QRCodeForm() {
         productId: id,
         productVariantId: variants[0].id,
         productTitle: title,
-        productHandle: handle,
         productAlt: images[0]?.altText,
         productImage: images[0]?.originalSrc,
       });
@@ -124,7 +129,6 @@ export default function QRCodeForm() {
       title: formState.title,
       productId: formState.productId || "",
       productVariantId: formState.productVariantId || "",
-      productHandle: formState.productHandle || "",
       destination: formState.destination,
     };
 
@@ -133,7 +137,10 @@ export default function QRCodeForm() {
 
   function handleDelete(e) {
     e.preventDefault();
-    submit({ action: "delete" }, { method: "post" });
+    submit(
+      { action: "delete", metaobjectId: initialFormState.id },
+      { method: "post" },
+    );
   }
   // [END use-submit]
 
@@ -173,7 +180,7 @@ export default function QRCodeForm() {
           {/* [END breadcrumbs] */}
             QR Codes
           </s-link>
-          {initialFormState.id &&
+          {initialFormState.handle &&
             <s-button slot="secondary-actions" onClick={handleDelete}>Delete</s-button>}
           <s-section heading="QR Code information">
             <s-stack gap="base">
@@ -332,8 +339,8 @@ export default function QRCodeForm() {
                   justifyContent="space-between"
                 >
                   <s-button
-                    disabled={!initialFormState.id}
-                    href={`/qrcodes/${initialFormState.id}`}
+                    disabled={!initialFormState.handle}
+                    href={`/qrcodes/${initialFormState.handle}?shop=${loaderData.shop}`}
                     target="_blank"
                   >
                     Go to public URL

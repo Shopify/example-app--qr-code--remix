@@ -1,3 +1,33 @@
 # This file stores configurations for your Shopify app.
 
-scopes = "write_products"
+scopes = "write_products,write_metaobjects,write_metaobject_definitions"
+
+[metaobjects.app.qrcode]
+name = "QR Code"
+display_name_field = "title"
+access.admin = "merchant_read_write"
+
+[metaobjects.app.qrcode.fields.title]
+type = "single_line_text_field"
+name = "Title"
+required = true
+
+[metaobjects.app.qrcode.fields.product]
+type = "product_reference"
+name = "Product"
+
+[metaobjects.app.qrcode.fields.product_variant]
+type = "variant_reference"
+name = "Product Variant"
+
+[metaobjects.app.qrcode.fields.destination]
+type = "single_line_text_field"
+name = "Destination"
+
+[[metaobjects.app.qrcode.fields.destination.validations]]
+name = "choices"
+value = '["product", "cart"]'
+
+[metaobjects.app.qrcode.fields.scans]
+type = "number_integer"
+name = "Scans"
