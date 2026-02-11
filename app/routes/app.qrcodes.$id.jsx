@@ -121,11 +121,9 @@ export default function QRCodeForm() {
 
   // [START use-submit]
   const submit = useSubmit();
-  const isDeletingRef = useRef(false);
 
   function handleSave(e) {
     e.preventDefault();
-    if (isDeletingRef.current) return;
 
     const data = {
       title: formState.title,
@@ -137,14 +135,28 @@ export default function QRCodeForm() {
     submit(data, { method: "post" });
   }
 
-  function handleDelete(e) {
-    e.preventDefault();
-    isDeletingRef.current = true;
-    submit(
-      { action: "delete", metaobjectId: initialFormState.id },
-      { method: "post" },
-    );
-  }
+  // Use a native event listener for delete because the s-button in
+  // slot="secondary-actions" is rendered by s-page through the admin
+  // chrome, so React's onClick (which relies on event delegation at the
+  // root) never receives the click event.
+  const deleteButtonRef = useRef(null);
+  const deleteDataRef = useRef(initialFormState.id);
+  deleteDataRef.current = initialFormState.id;
+
+  useEffect(() => {
+    const button = deleteButtonRef.current;
+    if (!button) return;
+
+    const handleDelete = () => {
+      submit(
+        { action: "delete", metaobjectId: deleteDataRef.current },
+        { method: "post" },
+      );
+    };
+
+    button.addEventListener("click", handleDelete);
+    return () => button.removeEventListener("click", handleDelete);
+  }, [submit]);
   // [END use-submit]
 
   // [START save-bar]
@@ -184,7 +196,7 @@ export default function QRCodeForm() {
             QR Codes
           </s-link>
           {initialFormState.handle &&
-            <s-button slot="secondary-actions" onClick={handleDelete}>Delete</s-button>}
+            <s-button ref={deleteButtonRef} slot="secondary-actions">Delete</s-button>}
           <s-section heading="QR Code information">
             <s-stack gap="base">
               {/* [START title] */}
