@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useActionData,
   useLoaderData,
@@ -121,9 +121,11 @@ export default function QRCodeForm() {
 
   // [START use-submit]
   const submit = useSubmit();
+  const isDeletingRef = useRef(false);
 
   function handleSave(e) {
     e.preventDefault();
+    if (isDeletingRef.current) return;
 
     const data = {
       title: formState.title,
@@ -137,6 +139,7 @@ export default function QRCodeForm() {
 
   function handleDelete(e) {
     e.preventDefault();
+    isDeletingRef.current = true;
     submit(
       { action: "delete", metaobjectId: initialFormState.id },
       { method: "post" },
