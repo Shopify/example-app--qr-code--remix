@@ -1,11 +1,26 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "write_products,write_metaobjects,write_metaobject_definitions"
+client_id = "f0f3262eea818a539b90c593bd3d7cef"
+name = "QR-Code-App-Template"
+application_url = "https://example.com"
+embedded = true
+
+[webhooks]
+api_version = "2026-04"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_metaobject_definitions,write_metaobjects,write_products"
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
 
 [metaobjects.app.qrcode]
 name = "QR Code"
 display_name_field = "title"
-access.admin = "merchant_read_write"
+
+  [metaobjects.app.qrcode.access]
+  admin = "merchant_read_write"
 
 [metaobjects.app.qrcode.fields.title]
 type = "single_line_text_field"
@@ -23,8 +38,13 @@ name = "Product Variant"
 [metaobjects.app.qrcode.fields.destination]
 type = "single_line_text_field"
 name = "Destination"
-validations.choices = ["product", "cart"]
+
+  [metaobjects.app.qrcode.fields.destination.validations]
+  choices = [ "product", "cart" ]
 
 [metaobjects.app.qrcode.fields.scans]
 type = "number_integer"
 name = "Scans"
+
+[build]
+automatically_update_urls_on_dev = true

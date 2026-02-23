@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useActionData,
   useLoaderData,
@@ -135,13 +135,24 @@ export default function QRCodeForm() {
     submit(data, { method: "post" });
   }
 
-  function handleDelete(e) {
-    e.preventDefault();
-    submit(
-      { action: "delete", metaobjectId: initialFormState.id },
-      { method: "post" },
-    );
-  }
+  const deleteButtonRef = useRef(null);
+  const deleteDataRef = useRef(initialFormState.id);
+  deleteDataRef.current = initialFormState.id;
+
+  useEffect(() => {
+    const button = deleteButtonRef.current;
+    if (!button) return;
+
+    const handleDelete = () => {
+      submit(
+        { action: "delete", metaobjectId: deleteDataRef.current },
+        { method: "post" },
+      );
+    };
+
+    button.addEventListener("click", handleDelete);
+    return () => button.removeEventListener("click", handleDelete);
+  }, [submit]);
   // [END use-submit]
 
   // [START save-bar]
@@ -181,7 +192,7 @@ export default function QRCodeForm() {
             QR Codes
           </s-link>
           {initialFormState.handle &&
-            <s-button slot="secondary-actions" onClick={handleDelete}>Delete</s-button>}
+            <s-button ref={deleteButtonRef} slot="secondary-actions">Delete</s-button>}
           <s-section heading="QR Code information">
             <s-stack gap="base">
               {/* [START title] */}
