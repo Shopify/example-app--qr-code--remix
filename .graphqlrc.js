@@ -1,23 +1,26 @@
-const fs = require("node:fs");
-const apiVersion = require("@shopify/shopify-app-remix").LATEST_API_VERSION;
-
+import fs from "fs";
+import { ApiVersion } from "@shopify/shopify-app-react-router/server";
+import { shopifyApiProject, ApiType } from "@shopify/api-codegen-preset";
 function getConfig() {
   const config = {
     projects: {
-      shopifyAdminApi: {
-        schema: `https://shopify.dev/admin-graphql-direct-proxy/${apiVersion}`,
-        documents: ["./app/**/*.{graphql,js,ts,jsx,tsx}"],
-      },
+      default: shopifyApiProject({
+        apiType: ApiType.Admin,
+        apiVersion: ApiVersion.October25,
+        documents: [
+          "./app/**/*.{js,ts,jsx,tsx}",
+          "./app/.server/**/*.{js,ts,jsx,tsx}",
+        ],
+        outputDir: "./app/types",
+      }),
     },
   };
-
   let extensions = [];
   try {
     extensions = fs.readdirSync("./extensions");
   } catch {
     // ignore if no extensions
   }
-
   for (const entry of extensions) {
     const extensionPath = `./extensions/${entry}`;
     const schema = `${extensionPath}/schema.graphql`;
@@ -26,11 +29,10 @@ function getConfig() {
     }
     config.projects[entry] = {
       schema,
-      documents: [`${extensionPath}/input.graphql`],
+      documents: [`${extensionPath}/**/*.graphql`],
     };
   }
-
   return config;
 }
-
-module.exports = getConfig();
+const config = getConfig();
+export default config;

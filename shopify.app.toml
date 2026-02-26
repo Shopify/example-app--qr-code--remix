@@ -1,3 +1,64 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "write_products"
+client_id = "d37a15bb4c3340e1c78a46ace83bc525"
+name = "prisma-to-metaobject-test"
+application_url = "https://example.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2026-04"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_metaobject_definitions,write_metaobjects,write_products"
+
+[auth]
+redirect_urls = [ "https://example.com/api/auth" ]
+
+[product.metafields.app.demo_info]
+type = "single_line_text_field"
+name = "Demo Source Info"
+description = "Tracks products created by the Shopify app template for development"
+
+  [product.metafields.app.demo_info.access]
+  admin = "merchant_read_write"
+
+[metaobjects.app.qrcode]
+name = "QR Code"
+description = "Stores QR code data linking products to scannable codes"
+
+  [metaobjects.app.qrcode.access]
+  admin = "merchant_read_write"
+
+[metaobjects.app.qrcode.fields.title]
+name = "Title"
+type = "single_line_text_field"
+required = true
+
+[metaobjects.app.qrcode.fields.product]
+name = "Product"
+type = "product_reference"
+
+[metaobjects.app.qrcode.fields.product_variant]
+name = "Product Variant"
+type = "variant_reference"
+
+[metaobjects.app.qrcode.fields.destination]
+name = "Destination"
+type = "single_line_text_field"
+
+[metaobjects.app.qrcode.fields.scans]
+name = "Scans"
+type = "number_integer"

@@ -1,23 +1,42 @@
-import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 
-import db from "../db.server";
+import { unauthenticated } from "../shopify.server";
 import { getQRCodeImage } from "../models/QRCode.server";
 
 // [START loader]
-export const loader = async ({ params }) => {
+export const loader = async ({ request, params }) => {
   invariant(params.id, "Could not find QR code destination");
 
-  const id = Number(params.id);
-  const qrCode = await db.qRCode.findFirst({ where: { id } });
+  const url = new URL(request.url);
+  const shop = url.searchParams.get("shop");
+  invariant(shop, "Missing shop parameter");
 
-  invariant(qrCode, "Could not find QR code destination");
+  const { admin } = await unauthenticated.admin(shop);
 
-  return json({
-    title: qrCode.title,
-    image: await getQRCodeImage(id),
-  });
+  const response = await admin.graphql(
+    `
+      query GetQRCodeTitle($handle: MetaobjectHandleInput!) {
+        metaobjectByHandle(handle: $handle) {
+          title: field(key: "title") { value }
+        }
+      }
+    `,
+    {
+      variables: {
+        handle: { type: "$app:qrcode", handle: params.id },
+      },
+    },
+  );
+
+  const { data } = await response.json();
+  const metaobject = data?.metaobjectByHandle;
+  invariant(metaobject, "Could not find QR code destination");
+
+  return {
+    title: metaobject.title.value,
+    image: await getQRCodeImage(params.id, shop),
+  };
 };
 // [END loader]
 
@@ -32,4 +51,4 @@ export default function QRCode() {
     </>
   );
 }
-// [START component]
+// [END component]
