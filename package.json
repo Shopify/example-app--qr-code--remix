@@ -70,6 +70,5 @@
   ],
   "overrides": {
     "p-map": "^4.0.0"
-  },
-  "author": "jamiediep"
+  }
 }
