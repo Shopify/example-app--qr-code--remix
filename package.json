@@ -1,5 +1,5 @@
 {
-  "name": "metaobject-qr-code-app",
+  "name": "app",
   "private": true,
   "scripts": {
     "build": "react-router build",
