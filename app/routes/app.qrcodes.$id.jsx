@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useActionData,
   useLoaderData,
@@ -145,20 +145,22 @@ export default function QRCodeForm() {
   // [END use-submit]
 
   // [START save-bar]
+  const saveBarRef = useRef(null);
+
   function handleReset() {
     setFormState(initialFormState);
-    window.shopify.saveBar.hide("qr-code-form");
+    saveBarRef.current?.hide();
   }
 
   useEffect(() => {
+    const saveBar = saveBarRef.current;
+    if (!saveBar) return;
+
     if (isDirty) {
-      window.shopify.saveBar.show("qr-code-form");
+      saveBar.show();
     } else {
-      window.shopify.saveBar.hide("qr-code-form");
+      saveBar.hide();
     }
-    return () => {
-      window.shopify.saveBar.hide("qr-code-form");
-    };
   }, [isDirty]);
 
   useEffect(() => {
@@ -168,7 +170,11 @@ export default function QRCodeForm() {
 
   return (
     <>
-      <form data-save-bar onSubmit={handleSave} onReset={handleReset}>
+      <ui-save-bar ref={saveBarRef} id="qr-code-form">
+        <button variant="primary" onClick={handleSave}></button>
+        <button onClick={handleReset}></button>
+      </ui-save-bar>
+      <form onSubmit={handleSave} onReset={handleReset}>
         {/* [START polaris] */}
         <s-page heading={initialFormState.title || "Create QR code"}>
           {/* [START breadcrumbs] */}
