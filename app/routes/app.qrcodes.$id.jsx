@@ -181,7 +181,6 @@ export default function QRCodeForm() {
           <s-link
             href="/app"
             slot="breadcrumb-actions"
-            onClick={(e) => (isDirty ? e.preventDefault() : navigate("/app/"))}
           >
           {/* [END breadcrumbs] */}
             QR Codes
@@ -305,6 +304,9 @@ export default function QRCodeForm() {
                     Select product
                   </s-button>
                 )}
+                {errors.productId ? (
+                  <s-text tone="critical">{errors.productId}</s-text>
+                ) : null}
               </s-stack>
             </s-stack>
           </s-section>
