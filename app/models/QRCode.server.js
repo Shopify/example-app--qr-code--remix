@@ -147,7 +147,7 @@ export async function getQRCodeImage(handle, shop) {
 // [START get-destination]
 export function getDestinationUrl(qrCode, shop) {
   if (qrCode.destination === "product") {
-    return `https://${shop}/products/${qrCode.productHandle}`;
+    return `https://${shop}/products/${qrCode.productHandle}?variant=${qrCode.productVariantLegacyId}`;
   }
 
   invariant(qrCode.productVariantLegacyId, "Unrecognised product variant ID");

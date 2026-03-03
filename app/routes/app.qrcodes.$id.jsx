@@ -90,11 +90,22 @@ export default function QRCodeForm() {
   async function selectProduct() {
     const products = await window.shopify.resourcePicker({
       type: "product",
-      action: "select", // customized action verb, either 'select' or 'add',
+      action: "select",
+      filter: { variants: true },
+      selectionIds: formState.productId
+        ? [
+            {
+              id: formState.productId,
+              variants: formState.productVariantId
+                ? [{ id: formState.productVariantId }]
+                : [],
+            },
+          ]
+        : [],
     });
 
     if (products) {
-      const { images, id, variants, title, handle } = products[0];
+      const { images, id, variants, title } = products[0];
 
       setFormState({
         ...formState,
