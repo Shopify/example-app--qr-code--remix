@@ -1,6 +1,6 @@
-# Build a Shopify app using Remix
+# Build a Shopify app using React Router
 
-This is a Shopify app for managing QR codes. It is the code for the [Build a Shopify app using Remix tutorial](https://shopify.dev/docs/apps/getting-started/build-qr-code-app).
+This is a Shopify app for managing QR codes. It is the code for the [Build a Shopify app using React Router tutorial](https://shopify.dev/docs/apps/getting-started/build-qr-code-app).
 
 You can [follow the tutorial](https://shopify.dev/docs/apps/getting-started/build-qr-code-app), or just browse the code.
 
@@ -30,36 +30,41 @@ Using pnpm:
 
 ```shell
 pnpm install
-pnpm run setup
 ```
 
 ### Local Development
 
-Using yarn:
-
 ```shell
-yarn dev
-```
-
-Using npm:
-
-```shell
-npm run dev
-```
-
-Using pnpm:
-
-```shell
-pnpm run dev
+shopify app dev
 ```
 
 Press P to open the URL to your app. Once you click install, you can start development.
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
+## Deployment
+
+### Application Storage
+
+This template uses [Prisma](https://www.prisma.io/) to store session data, by default using an [SQLite](https://www.sqlite.org/index.html) database.
+The database is defined as a Prisma schema in `prisma/schema.prisma`.
+
+This use of SQLite works in production if your app runs as a single instance.
+The database that works best for you depends on the data your app needs and how it is queried.
+Here’s a short list of databases providers that provide a free tier to get started:
+
+| Database   | Type             | Hosters                                                                                                                                                                                                                               |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MySQL      | SQL              | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-mysql), [Planet Scale](https://planetscale.com/), [Amazon Aurora](https://aws.amazon.com/rds/aurora/), [Google Cloud SQL](https://cloud.google.com/sql/docs/mysql) |
+| PostgreSQL | SQL              | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-postgresql), [Amazon Aurora](https://aws.amazon.com/rds/aurora/), [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)                                   |
+| Redis      | Key-value        | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-redis), [Amazon MemoryDB](https://aws.amazon.com/memorydb/)                                                                                                        |
+| MongoDB    | NoSQL / Document | [Digital Ocean](https://www.digitalocean.com/products/managed-databases-mongodb), [MongoDB Atlas](https://www.mongodb.com/atlas/database)                                                                                                  |
+
+To use one of these, you can use a different [datasource provider](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#datasource) in your `schema.prisma` file, or a different [SessionStorage adapter package](https://github.com/Shopify/shopify-api-js/blob/main/packages/shopify-api/docs/guides/session-storage.md).
+
 ### Build
 
-Remix handles building the app for you, by running the command below with the package manager of your choice:
+Build the app by running the command below with the package manager of your choice:
 
 Using yarn:
 
@@ -85,26 +90,23 @@ When you're ready to set up your app in production, you can follow [our deployme
 
 When you reach the step for [setting up environment variables](https://shopify.dev/docs/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
 
-## Tech Stack
-
-This template uses [Remix](https://remix.run). The following Shopify tools are also included to ease app development:
-
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/main/packages/shopify-app-remix/README.md) provides authentication and methods for interacting with Shopify APIs.
-- [Shopify App Bridge](https://shopify.dev/docs/apps/tools/app-bridge) allows your app to seamlessly integrate your app within Shopify's Admin.
-- [Polaris React](https://polaris.shopify.com/) is a powerful design system and component library that helps developers build high quality, consistent experiences for Shopify merchants.
-- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/add_remix_package/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
-
-> **Note**: This template runs on JavaScript, but it's fully set up for [TypeScript](https://www.typescriptlang.org/).
-> If you want to create your routes using TypeScript, we recommend removing the `noImplicitAny` config from [`tsconfig.json`](/tsconfig.json)
 
 ## Resources
 
-- [Remix Docs](https://remix.run/docs/en/v1)
-- [Shopify App Remix](https://github.com/Shopify/shopify-app-js/blob/release-candidate/packages/shopify-app-remix/README.md)
-- [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
-- [App authentication](https://shopify.dev/docs/apps/auth)
+React Router:
+
+- [React Router docs](https://reactrouter.com/home)
+
+Shopify:
+
+- [Intro to Shopify apps](https://shopify.dev/docs/apps/getting-started)
+- [Shopify App React Router docs](https://shopify.dev/docs/api/shopify-app-react-router)
 - [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
+- [Shopify App Bridge](https://shopify.dev/docs/api/app-bridge-library).
+- [Polaris Web Components](https://shopify.dev/docs/api/app-home/polaris-web-components).
 - [App extensions](https://shopify.dev/docs/apps/app-extensions/list)
 - [Shopify Functions](https://shopify.dev/docs/api/functions)
-- [Getting started with internationalizing your app](https://shopify.dev/docs/apps/best-practices/internationalization/getting-started)
+
+Internationalization:
+
+- [Internationalizing your app](https://shopify.dev/docs/apps/best-practices/internationalization/getting-started)
