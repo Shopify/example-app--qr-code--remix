@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   useActionData,
   useLoaderData,
@@ -10,12 +10,17 @@ import {
 import { authenticate } from "../shopify.server";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 
-import db from "../db.server";
-import { getQRCode, validateQRCode } from "../models/QRCode.server";
+import {
+  getQRCode,
+  validateQRCode,
+  saveQRCode,
+  deleteQRCode,
+  generateHandle,
+} from "../models/QRCode.server";
 
 export async function loader({ request, params }) {
   // [START authenticate]
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   // [END authenticate]
 
   // [START data]
@@ -23,26 +28,26 @@ export async function loader({ request, params }) {
     return {
       destination: "product",
       title: "",
+      shop: session.shop,
     };
   }
 
-  return await getQRCode(Number(params.id), admin.graphql);
+  const qrCode = await getQRCode(params.id, admin.graphql, session.shop);
+  return { ...qrCode, shop: session.shop };
   // [END data]
 }
 
 // [START action]
 export async function action({ request, params }) {
-  const { session, redirect } = await authenticate.admin(request);
-  const { shop } = session;
+  const { session, admin, redirect } = await authenticate.admin(request);
 
   /** @type {any} */
   const data = {
     ...Object.fromEntries(await request.formData()),
-    shop,
   };
 
   if (data.action === "delete") {
-    await db.qRCode.delete({ where: { id: Number(params.id) } });
+    await deleteQRCode(data.metaobjectId, admin.graphql);
     return redirect("/app");
   }
 
@@ -57,12 +62,12 @@ export async function action({ request, params }) {
     });
   }
 
-  const qrCode =
-    params.id === "new"
-      ? await db.qRCode.create({ data })
-      : await db.qRCode.update({ where: { id: Number(params.id) }, data });
+  const handle =
+    params.id === "new" ? generateHandle(data.title) : params.id;
 
-  return redirect(`/app/qrcodes/${qrCode.id}`);
+  const metaobject = await saveQRCode(handle, data, admin.graphql);
+
+  return redirect(`/app/qrcodes/${metaobject.handle}`);
 }
 // [END action]
 
@@ -71,7 +76,8 @@ export default function QRCodeForm() {
   const { id } = useParams();
 
   // [START state]
-  const qrCode = useLoaderData();
+  const loaderData = useLoaderData();
+  const qrCode = loaderData;
   const [initialFormState, setInitialFormState] = useState(qrCode);
   const [formState, setFormState] = useState(qrCode);
   const errors = useActionData()?.errors || {};
@@ -84,18 +90,28 @@ export default function QRCodeForm() {
   async function selectProduct() {
     const products = await window.shopify.resourcePicker({
       type: "product",
-      action: "select", // customized action verb, either 'select' or 'add',
+      action: "select",
+      filter: { variants: true },
+      selectionIds: formState.productId
+        ? [
+            {
+              id: formState.productId,
+              variants: formState.productVariantId
+                ? [{ id: formState.productVariantId }]
+                : [],
+            },
+          ]
+        : [],
     });
 
     if (products) {
-      const { images, id, variants, title, handle } = products[0];
+      const { images, id, variants, title } = products[0];
 
       setFormState({
         ...formState,
         productId: id,
         productVariantId: variants[0].id,
         productTitle: title,
-        productHandle: handle,
         productAlt: images[0]?.altText,
         productImage: images[0]?.originalSrc,
       });
@@ -124,7 +140,6 @@ export default function QRCodeForm() {
       title: formState.title,
       productId: formState.productId || "",
       productVariantId: formState.productVariantId || "",
-      productHandle: formState.productHandle || "",
       destination: formState.destination,
     };
 
@@ -133,25 +148,30 @@ export default function QRCodeForm() {
 
   function handleDelete(e) {
     e.preventDefault();
-    submit({ action: "delete" }, { method: "post" });
+    submit(
+      { action: "delete", metaobjectId: initialFormState.id },
+      { method: "post" },
+    );
   }
   // [END use-submit]
 
   // [START save-bar]
+  const saveBarRef = useRef(null);
+
   function handleReset() {
     setFormState(initialFormState);
-    window.shopify.saveBar.hide("qr-code-form");
+    saveBarRef.current?.hide();
   }
 
   useEffect(() => {
+    const saveBar = saveBarRef.current;
+    if (!saveBar) return;
+
     if (isDirty) {
-      window.shopify.saveBar.show("qr-code-form");
+      saveBar.show();
     } else {
-      window.shopify.saveBar.hide("qr-code-form");
+      saveBar.hide();
     }
-    return () => {
-      window.shopify.saveBar.hide("qr-code-form");
-    };
   }, [isDirty]);
 
   useEffect(() => {
@@ -161,19 +181,22 @@ export default function QRCodeForm() {
 
   return (
     <>
-      <form data-save-bar onSubmit={handleSave} onReset={handleReset}>
+      <ui-save-bar ref={saveBarRef} id="qr-code-form">
+        <button variant="primary" onClick={handleSave}></button>
+        <button onClick={handleReset}></button>
+      </ui-save-bar>
+      <form onSubmit={handleSave} onReset={handleReset}>
         {/* [START polaris] */}
         <s-page heading={initialFormState.title || "Create QR code"}>
           {/* [START breadcrumbs] */}
           <s-link
             href="/app"
             slot="breadcrumb-actions"
-            onClick={(e) => (isDirty ? e.preventDefault() : navigate("/app/"))}
           >
           {/* [END breadcrumbs] */}
             QR Codes
           </s-link>
-          {initialFormState.id &&
+          {initialFormState.handle &&
             <s-button slot="secondary-actions" onClick={handleDelete}>Delete</s-button>}
           <s-section heading="QR Code information">
             <s-stack gap="base">
@@ -292,6 +315,9 @@ export default function QRCodeForm() {
                     Select product
                   </s-button>
                 )}
+                {errors.productId ? (
+                  <s-text tone="critical">{errors.productId}</s-text>
+                ) : null}
               </s-stack>
             </s-stack>
           </s-section>
@@ -332,8 +358,8 @@ export default function QRCodeForm() {
                   justifyContent="space-between"
                 >
                   <s-button
-                    disabled={!initialFormState.id}
-                    href={`/qrcodes/${initialFormState.id}`}
+                    disabled={!initialFormState.handle}
+                    href={`/qrcodes/${initialFormState.handle}?shop=${loaderData.shop}`}
                     target="_blank"
                   >
                     Go to public URL
