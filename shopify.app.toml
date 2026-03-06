@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "5430497d8dd544f37f3d8a014d7c8b4e"
-name = "app"
-application_url = "https://shopify.dev/apps/default-app-home"
+client_id = "<YOUR_CLIENT_ID>"
+name = "<YOUR_APP_NAME>"
+application_url = "<YOUR_APP_URL>"
 embedded = true
 
 [build]
@@ -12,13 +12,16 @@ include_config_on_deploy = true
 [webhooks]
 api_version = "2026-04"
 
+# [START access-scopes]
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_metaobject_definitions,write_metaobjects,write_products"
+# [END access-scopes]
 
 [auth]
-redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+redirect_urls = [ "<YOUR_APP_URL>/api/auth" ]
 
+# [START metaobject-definition]
 [metaobjects.app.qrcode]
 name = "QR Code"
 display_name_field = "title"
@@ -49,3 +52,4 @@ name = "Destination"
 [metaobjects.app.qrcode.fields.scans]
 type = "number_integer"
 name = "Scans"
+# [END metaobject-definition]
