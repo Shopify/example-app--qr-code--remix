@@ -12,6 +12,14 @@ include_config_on_deploy = true
 [webhooks]
 api_version = "2026-04"
 
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
 # [START access-scopes]
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -19,37 +27,42 @@ scopes = "write_metaobject_definitions,write_metaobjects,write_products"
 # [END access-scopes]
 
 [auth]
-redirect_urls = [ "<YOUR_APP_URL>/api/auth" ]
+redirect_urls = [ "https://example.com/api/auth" ]
+
+[product.metafields.app.demo_info]
+type = "single_line_text_field"
+name = "Demo Source Info"
+description = "Tracks products created by the Shopify app template for development"
+
+  [product.metafields.app.demo_info.access]
+  admin = "merchant_read_write"
 
 # [START metaobject-definition]
 [metaobjects.app.qrcode]
 name = "QR Code"
-display_name_field = "title"
+description = "QR codes that link to products"
 
   [metaobjects.app.qrcode.access]
   admin = "merchant_read_write"
 
 [metaobjects.app.qrcode.fields.title]
-type = "single_line_text_field"
 name = "Title"
+type = "single_line_text_field"
 required = true
 
 [metaobjects.app.qrcode.fields.product]
-type = "product_reference"
 name = "Product"
+type = "product_reference"
 
 [metaobjects.app.qrcode.fields.product_variant]
-type = "variant_reference"
 name = "Product Variant"
+type = "variant_reference"
 
 [metaobjects.app.qrcode.fields.destination]
-type = "single_line_text_field"
 name = "Destination"
-
-  [metaobjects.app.qrcode.fields.destination.validations]
-  choices = [ "product", "cart" ]
+type = "single_line_text_field"
 
 [metaobjects.app.qrcode.fields.scans]
-type = "number_integer"
 name = "Scans"
+type = "number_integer"
 # [END metaobject-definition]

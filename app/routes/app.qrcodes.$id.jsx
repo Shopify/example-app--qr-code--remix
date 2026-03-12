@@ -3,8 +3,6 @@ import {
   useActionData,
   useLoaderData,
   useSubmit,
-  useNavigation,
-  useNavigate,
   useParams,
 } from "react-router";
 import { authenticate } from "../shopify.server";
@@ -39,12 +37,9 @@ export async function loader({ request, params }) {
 
 // [START action]
 export async function action({ request, params }) {
-  const { session, admin, redirect } = await authenticate.admin(request);
+  const { admin, redirect } = await authenticate.admin(request);
 
-  /** @type {any} */
-  const data = {
-    ...Object.fromEntries(await request.formData()),
-  };
+  const data = Object.fromEntries(await request.formData());
 
   if (data.action === "delete") {
     await deleteQRCode(data.metaobjectId, admin.graphql);
@@ -72,7 +67,6 @@ export async function action({ request, params }) {
 // [END action]
 
 export default function QRCodeForm() {
-  const navigate = useNavigate();
   const { id } = useParams();
 
   // [START state]
@@ -81,7 +75,6 @@ export default function QRCodeForm() {
   const [initialFormState, setInitialFormState] = useState(qrCode);
   const [formState, setFormState] = useState(qrCode);
   const errors = useActionData()?.errors || {};
-  const isSaving = useNavigation().state === "submitting";
   const isDirty =
     JSON.stringify(formState) !== JSON.stringify(initialFormState);
   // [END state]
@@ -185,6 +178,7 @@ export default function QRCodeForm() {
         <button variant="primary" onClick={handleSave}></button>
         <button onClick={handleReset}></button>
       </ui-save-bar>
+      {/* [END save-bar] */}
       <form onSubmit={handleSave} onReset={handleReset}>
         {/* [START polaris] */}
         <s-page heading={initialFormState.title || "Create QR code"}>
@@ -316,7 +310,10 @@ export default function QRCodeForm() {
                   </s-button>
                 )}
                 {errors.productId ? (
-                  <s-text tone="critical">{errors.productId}</s-text>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <s-icon type="alert-circle" tone="critical" size="small" />
+                    <s-text tone="critical" variant="bodySm">{errors.productId}</s-text>
+                  </div>
                 ) : null}
               </s-stack>
             </s-stack>

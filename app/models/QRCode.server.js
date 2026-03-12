@@ -1,9 +1,9 @@
 import qrcode from "qrcode";
 import invariant from "tiny-invariant";
 
+// [START get-qrcode]
 const METAOBJECT_TYPE = "$app:qrcode";
 
-// [START get-qrcode]
 export async function getQRCode(handle, graphql, shop) {
   const response = await graphql(
     `
@@ -103,7 +103,6 @@ export async function getQRCodes(graphql, shop) {
 
   return Promise.all(metaobjects.map((mo) => transformMetaobject(mo, shop)));
 }
-// [END get-qrcode]
 
 async function transformMetaobject(metaobject, shop) {
   const product = metaobject.product?.reference;
@@ -132,6 +131,7 @@ async function transformMetaobject(metaobject, shop) {
 
   return qrCode;
 }
+// [END get-qrcode]
 
 // [START get-qrcode-image]
 export async function getQRCodeImage(handle, shop) {
@@ -240,6 +240,7 @@ export async function incrementQRCodeScans(id, currentScans, graphql) {
 }
 // [END increment-scans]
 
+// [START generate-handle]
 function slugify(text) {
   return text
     .toLowerCase()
@@ -250,6 +251,7 @@ function slugify(text) {
 export function generateHandle(title) {
   return `${slugify(title)}-${Date.now().toString(36)}`;
 }
+// [END generate-handle]
 
 // [START validate-qrcode]
 export function validateQRCode(data) {
