@@ -48,11 +48,13 @@ const EmptyQRCodeState = () => (
 );
 // [END empty]
 
+// [START truncate]
 function truncate(str, { length = 25 } = {}) {
   if (!str) return "";
   if (str.length <= length) return str;
   return str.slice(0, length) + "…";
 }
+// [END truncate]
 
 // [START table]
 const QRTable = ({ qrCodes }) => (

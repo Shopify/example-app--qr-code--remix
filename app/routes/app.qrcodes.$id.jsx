@@ -178,6 +178,7 @@ export default function QRCodeForm() {
         <button variant="primary" onClick={handleSave}></button>
         <button onClick={handleReset}></button>
       </ui-save-bar>
+      {/* [END save-bar] */}
       <form onSubmit={handleSave} onReset={handleReset}>
         {/* [START polaris] */}
         <s-page heading={initialFormState.title || "Create QR code"}>
