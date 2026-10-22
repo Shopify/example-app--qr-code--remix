@@ -265,15 +265,10 @@ export async function incrementQRCodeScans(id, currentScans, graphql) {
 // [END increment-scans]
 
 // [START generate-handle]
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-export function generateHandle(title) {
-  return `${slugify(title)}-${Date.now().toString(36)}`;
+// The handle is encoded in the QR code and public URLs, so it must not be
+// derived from the staff-only title.
+export function generateHandle() {
+  return `qr-${crypto.randomUUID()}`;
 }
 // [END generate-handle]
 

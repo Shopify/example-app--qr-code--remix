@@ -63,8 +63,7 @@ export async function action({ request, params }) {
     });
   }
 
-  const handle =
-    params.id === "new" ? generateHandle(data.title) : params.id;
+  const handle = params.id === "new" ? generateHandle() : params.id;
 
   const metaobject = await saveQRCode(handle, data, admin.graphql);
 
