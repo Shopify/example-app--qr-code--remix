@@ -194,7 +194,29 @@ export async function saveQRCode(handle, data, graphql) {
 // [END save-qrcode]
 
 // [START delete-qrcode]
-export async function deleteQRCode(id, graphql) {
+export async function deleteQRCode(handle, graphql) {
+  // Look the QR code up by handle within the app's own metaobject type, so
+  // only a $app:qrcode entry can ever reach metaobjectDelete.
+  const lookupResponse = await graphql(
+    `
+      query GetQRCodeId($handle: MetaobjectHandleInput!) {
+        metaobjectByHandle(handle: $handle) { id }
+      }
+    `,
+    {
+      variables: {
+        handle: { type: METAOBJECT_TYPE, handle },
+      },
+    },
+  );
+
+  const { data: lookupData } = await lookupResponse.json();
+  const id = lookupData?.metaobjectByHandle?.id;
+
+  if (!id) {
+    return null;
+  }
+
   const response = await graphql(
     `
       mutation DeleteQRCode($id: ID!) {
@@ -214,6 +236,8 @@ export async function deleteQRCode(id, graphql) {
   if (data.metaobjectDelete.userErrors.length) {
     throw new Error(data.metaobjectDelete.userErrors[0].message);
   }
+
+  return data.metaobjectDelete.deletedId;
 }
 // [END delete-qrcode]
 
