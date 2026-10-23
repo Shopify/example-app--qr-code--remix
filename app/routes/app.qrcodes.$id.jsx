@@ -42,7 +42,13 @@ export async function action({ request, params }) {
   const data = Object.fromEntries(await request.formData());
 
   if (data.action === "delete") {
-    await deleteQRCode(data.metaobjectId, admin.graphql);
+    // Resolve the target from the route handle, never from the request body.
+    const deletedId = await deleteQRCode(params.id, admin.graphql);
+
+    if (!deletedId) {
+      throw new Response("QR code not found", { status: 404 });
+    }
+
     return redirect("/app");
   }
 
@@ -57,8 +63,7 @@ export async function action({ request, params }) {
     });
   }
 
-  const handle =
-    params.id === "new" ? generateHandle(data.title) : params.id;
+  const handle = params.id === "new" ? generateHandle() : params.id;
 
   const metaobject = await saveQRCode(handle, data, admin.graphql);
 
@@ -141,10 +146,7 @@ export default function QRCodeForm() {
 
   function handleDelete(e) {
     e.preventDefault();
-    submit(
-      { action: "delete", metaobjectId: initialFormState.id },
-      { method: "post" },
-    );
+    submit({ action: "delete" }, { method: "post" });
   }
   // [END use-submit]
 

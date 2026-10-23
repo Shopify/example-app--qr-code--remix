@@ -194,7 +194,29 @@ export async function saveQRCode(handle, data, graphql) {
 // [END save-qrcode]
 
 // [START delete-qrcode]
-export async function deleteQRCode(id, graphql) {
+export async function deleteQRCode(handle, graphql) {
+  // Look the QR code up by handle within the app's own metaobject type, so
+  // only a $app:qrcode entry can ever reach metaobjectDelete.
+  const lookupResponse = await graphql(
+    `
+      query GetQRCodeId($handle: MetaobjectHandleInput!) {
+        metaobjectByHandle(handle: $handle) { id }
+      }
+    `,
+    {
+      variables: {
+        handle: { type: METAOBJECT_TYPE, handle },
+      },
+    },
+  );
+
+  const { data: lookupData } = await lookupResponse.json();
+  const id = lookupData?.metaobjectByHandle?.id;
+
+  if (!id) {
+    return null;
+  }
+
   const response = await graphql(
     `
       mutation DeleteQRCode($id: ID!) {
@@ -214,6 +236,8 @@ export async function deleteQRCode(id, graphql) {
   if (data.metaobjectDelete.userErrors.length) {
     throw new Error(data.metaobjectDelete.userErrors[0].message);
   }
+
+  return data.metaobjectDelete.deletedId;
 }
 // [END delete-qrcode]
 
@@ -241,15 +265,10 @@ export async function incrementQRCodeScans(id, currentScans, graphql) {
 // [END increment-scans]
 
 // [START generate-handle]
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-export function generateHandle(title) {
-  return `${slugify(title)}-${Date.now().toString(36)}`;
+// The handle is encoded in the QR code and public URLs, so it must not be
+// derived from the staff-only title.
+export function generateHandle() {
+  return `qr-${crypto.randomUUID()}`;
 }
 // [END generate-handle]
 

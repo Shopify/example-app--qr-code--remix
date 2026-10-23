@@ -16,10 +16,8 @@ export const loader = async ({ request, params }) => {
 
   const response = await admin.graphql(
     `
-      query GetQRCodeTitle($handle: MetaobjectHandleInput!) {
-        metaobjectByHandle(handle: $handle) {
-          title: field(key: "title") { value }
-        }
+      query GetPublicQRCode($handle: MetaobjectHandleInput!) {
+        metaobjectByHandle(handle: $handle) { id }
       }
     `,
     {
@@ -33,8 +31,8 @@ export const loader = async ({ request, params }) => {
   const metaobject = data?.metaobjectByHandle;
   invariant(metaobject, "Could not find QR code destination");
 
+  // Don't return the title: the editor promises only store staff can see it.
   return {
-    title: metaobject.title.value,
     image: await getQRCodeImage(params.id, shop),
   };
 };
@@ -42,11 +40,11 @@ export const loader = async ({ request, params }) => {
 
 // [START component]
 export default function QRCode() {
-  const { image, title } = useLoaderData();
+  const { image } = useLoaderData();
 
   return (
     <>
-      <h1>{title}</h1>
+      <h1>Scan this QR code</h1>
       <img src={image} alt={`QR Code for product`} />
     </>
   );
